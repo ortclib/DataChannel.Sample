@@ -50,5 +50,10 @@
 	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
 	<string>DataChannelOrtc</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>voip</string>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>
