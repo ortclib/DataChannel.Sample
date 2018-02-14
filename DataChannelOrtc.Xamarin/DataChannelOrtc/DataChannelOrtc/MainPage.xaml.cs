@@ -145,10 +145,6 @@ namespace DataChannelOrtc
             };
             _gatherer.OnLocalCandidateComplete += (@event) =>
             {
-                Debug.WriteLine("RemotePeer.Id: " + RemotePeer.Id);
-                Debug.WriteLine("@event.ToString(): " + @event.ToString());
-
-                Debug.WriteLine("@event.Candidate.ToJson().ToString(): " + @event.Candidate.ToJson().ToString());
                 _httpSignaler.SendToPeer(RemotePeer.Id, @event.Candidate.ToJson().ToString());
             };
 
@@ -270,13 +266,12 @@ namespace DataChannelOrtc
         private async Task HandleMessageFromPeer(object sender, Peer peer)
         {
             var message = peer.Message;
-            Debug.WriteLine("peer.Message");
-            //peer.Id = HttpSignaler._peerId;
-            Debug.WriteLine($"peer.Id: {HttpSignaler._peerId}");
-            //peer.Name = "Remote Peer!";
 
-            var x = HttpSignaler._peers.SingleOrDefault(p => p.Id == HttpSignaler._peerId);
-            peer.Name = x.Name;
+            peer.Name = (HttpSignaler._peers.SingleOrDefault(p => 
+                p.Id == HttpSignaler._peerId)).Name;
+
+            Debug.WriteLine($"peer.Message {peer.Message}");
+            Debug.WriteLine($"peer.Id: {HttpSignaler._peerId}");
             Debug.WriteLine($"peer.Name: {peer.Name}");
 
             if (message.StartsWith("OpenDataChannel"))
@@ -415,7 +410,10 @@ namespace DataChannelOrtc
         {
             Debug.WriteLine("DataChannel state: " + @event.State);
             if (@event.State.ToString() == "Open")
+            {
+                chatSession[RemotePeer].OnTwoPeersConnected();
                 _IsSendEnabled = true;
+            }
         }
 
         /// <summary>

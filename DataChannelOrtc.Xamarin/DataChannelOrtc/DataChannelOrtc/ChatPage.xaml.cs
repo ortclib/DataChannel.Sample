@@ -10,12 +10,20 @@ namespace DataChannelOrtc
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class ChatPage : ContentPage
 	{
+        public EventHandler TwoPeersConnected;
         public event EventHandler MessageFromRemotePeer;
+
+        public void OnTwoPeersConnected()
+        {
+            TwoPeersConnected?.Invoke(this, (null));
+
+            btnSend.IsEnabled = true;
+        }
 
         public void OnMessageFromRemotePeer()
         {
-            Debug.WriteLine("OnMessageFromRemotePeer!!!");
             MessageFromRemotePeer?.Invoke(this, (null));
+
             if (MainPage._messages.Count > 0)
             {
                 var target = MainPage._messages[MainPage._messages.Count - 1];
@@ -33,23 +41,11 @@ namespace DataChannelOrtc
             InitView(peer);
         }
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            if (MainPage._messages.Count > 0)
-            {
-                var target = MainPage._messages[MainPage._messages.Count - 1];
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    listMessages.ScrollTo(target, ScrollToPosition.End, true);
-                });
-            }
-        }
-
         private void InitView(Peer peer)
         {
             listMessages.ItemsSource = MainPage._messages;
             entryMessage.Text = string.Empty;
+            btnSend.IsEnabled = false;
 
             // Page structure 
             Content = new StackLayout
