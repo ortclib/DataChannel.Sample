@@ -272,8 +272,12 @@ namespace DataChannelOrtc
             var message = peer.Message;
             Debug.WriteLine("peer.Message");
             //peer.Id = HttpSignaler._peerId;
-            Debug.WriteLine($"peer.Id {HttpSignaler._peerId}");
-            peer.Name = "Remote Peer!";
+            Debug.WriteLine($"peer.Id: {HttpSignaler._peerId}");
+            //peer.Name = "Remote Peer!";
+
+            var x = HttpSignaler._peers.SingleOrDefault(p => p.Id == HttpSignaler._peerId);
+            peer.Name = x.Name;
+            Debug.WriteLine($"peer.Name: {peer.Name}");
 
             if (message.StartsWith("OpenDataChannel"))
             {
