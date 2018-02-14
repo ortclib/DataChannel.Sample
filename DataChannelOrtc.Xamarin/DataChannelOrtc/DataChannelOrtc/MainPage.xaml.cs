@@ -43,6 +43,8 @@ namespace DataChannelOrtc
 
         public static ObservableCollection<Message> _messages = new ObservableCollection<Message>();
 
+        Dictionary<Peer, ChatPage> chatSession = new Dictionary<Peer, ChatPage>();
+
         private Peer _remotePeer;
         public Peer RemotePeer
         {
@@ -288,11 +290,18 @@ namespace DataChannelOrtc
 
                 // Begin gathering ice candidates.
                 OpenDataChannel(peer);
-                Device.BeginInvokeOnMainThread(async () =>
+
+                if (!chatSession.ContainsKey(RemotePeer))
                 {
-                    // invoke this on the main thread without blocking the current thread from continuing
-                    await Navigation.PushAsync(new ChatPage(RemotePeer));
-                });
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        // invoke this on the main thread without blocking the current thread from continuing
+                        ChatPage chatPage = new ChatPage(RemotePeer);
+                        chatSession.Add(RemotePeer, chatPage);
+                        await Navigation.PushAsync(chatPage);
+                    });
+                }
+                    
                 return;
             }
 
@@ -380,6 +389,7 @@ namespace DataChannelOrtc
         {
             Debug.WriteLine("Datachannel message: " + evt.Text);
             _messages.Add(new Message(DateTime.Now.ToString("h:mm"), RemotePeer.Name + ": " + evt.Text));
+            chatSession[RemotePeer].OnMessageFromRemotePeer();
         }
 
         private void Sctp_OnStateChange(RTCSctpTransportStateChangeEvent evt)
@@ -484,10 +494,15 @@ namespace DataChannelOrtc
 
                 OpenDataChannel(RemotePeer);
 
-                Device.BeginInvokeOnMainThread(async () =>
+                if (!chatSession.ContainsKey(RemotePeer))
                 {
-                    await Navigation.PushAsync(new ChatPage(RemotePeer));
-                });
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        ChatPage chatPage = new ChatPage(RemotePeer);
+                        chatSession.Add(RemotePeer, chatPage);
+                        await Navigation.PushAsync(chatPage);
+                    });
+                }
             };
         }
     }
