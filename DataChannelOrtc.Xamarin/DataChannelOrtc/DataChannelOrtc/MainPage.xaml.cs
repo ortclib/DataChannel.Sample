@@ -466,6 +466,8 @@ namespace DataChannelOrtc
 
                 await _httpSignaler.Connect();
 
+                HttpSignaler._peers.Remove(p => p.Name == LocalPeer.Name);
+
                 ConnectPeer.IsEnabled = false;
                 DisconnectPeer.IsEnabled = true;
             };
