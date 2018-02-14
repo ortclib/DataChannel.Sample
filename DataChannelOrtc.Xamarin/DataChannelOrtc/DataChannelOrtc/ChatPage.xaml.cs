@@ -1,6 +1,5 @@
 ﻿using DataChannelOrtc.Signaling;
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using Xamarin.Forms;
@@ -15,30 +14,13 @@ namespace DataChannelOrtc
         {
             InitializeComponent();
 
-            //this.MessageAdded += ChatPage_MessageAdded;
-
             InitView(peer);
         }
-
-        private void ChatPage_MessageAdded(object sender, Message message)
-        {
-            Debug.WriteLine("ChatPage_MessageAdded: " + message.ToString());
-            MainPage._messages.Add(message);
-        }
-
-        //public event EventHandler<Message> MessageAdded;
-
-        //public void OnMessageAdded(Message message)
-        //{
-        //    if (MessageAdded != null)
-        //        MessageAdded(this, (message));
-        //}
-
-        //public static ObservableCollection<Message> _messages = new ObservableCollection<Message>();
 
         private void InitView(Peer peer)
         {
             listMessages.ItemsSource = MainPage._messages;
+            entryMessage.Text = string.Empty;
 
             // Page structure 
             Content = new StackLayout
@@ -54,17 +36,24 @@ namespace DataChannelOrtc
 
             btnSend.Clicked += (sender, args) =>
             {
-                if (entryMessage.Text != string.Empty)
+                if (MainPage._IsSendEnabled != false)
                 {
-                    string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
-                    MainPage._messages.Add(new Message(DateTime.Now.ToString("h:mm"), hostname + ": " + entryMessage.Text));
-                    MainPage._dataChannel.Send(entryMessage.Text);
+                    if (entryMessage.Text != string.Empty)
+                    {
+                        string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
+                        MainPage._messages.Add(new Message(DateTime.Now.ToString("h:mm"), hostname + ": " + entryMessage.Text));
+                        MainPage._dataChannel.Send(entryMessage.Text);
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Message box is empty, write something...");
+                    }
+                    entryMessage.Text = string.Empty;
                 }
                 else
                 {
-                    Debug.Write("Message is empty!");
+                    Debug.Write("Please wait, connecting...");
                 }
-                entryMessage.Text = string.Empty;
             };
         }
     }

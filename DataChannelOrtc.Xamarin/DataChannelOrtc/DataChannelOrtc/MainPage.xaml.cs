@@ -3,7 +3,6 @@ using Org.Ortc;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -172,10 +171,6 @@ namespace DataChannelOrtc
         private void IceTransport_OnStateChange(RTCIceTransportStateChangeEvent evt)
         {
             Debug.WriteLine("IceTransport State Change: " + evt.State);
-
-            if (evt.State.ToString() == "Completed")
-                _IsSendEnabled = true;
-
         }
 
         private void Dtls_OnStateChange(RTCDtlsTransportStateChangeEvent evt)
@@ -293,13 +288,11 @@ namespace DataChannelOrtc
 
                 // Begin gathering ice candidates.
                 OpenDataChannel(peer);
-                //Device.BeginInvokeOnMainThread(async () =>
-                //{
-
+                Device.BeginInvokeOnMainThread(async () =>
+                {
                     // invoke this on the main thread without blocking the current thread from continuing
                     await Navigation.PushAsync(new ChatPage(RemotePeer));
-
-                //});
+                });
                 return;
             }
 
@@ -407,6 +400,8 @@ namespace DataChannelOrtc
         private void DataChannel_OnStateChange(RTCDataChannelStateChangeEvent @event)
         {
             Debug.WriteLine("DataChannel state: " + @event.State);
+            if (@event.State.ToString() == "Open")
+                _IsSendEnabled = true;
         }
 
         /// <summary>
@@ -489,10 +484,10 @@ namespace DataChannelOrtc
 
                 OpenDataChannel(RemotePeer);
 
-                //Device.BeginInvokeOnMainThread(async () =>
-                //{
+                Device.BeginInvokeOnMainThread(async () =>
+                {
                     await Navigation.PushAsync(new ChatPage(RemotePeer));
-                //});
+                });
             };
         }
     }
