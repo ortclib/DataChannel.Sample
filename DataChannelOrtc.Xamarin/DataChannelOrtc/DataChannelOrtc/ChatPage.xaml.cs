@@ -1,5 +1,6 @@
 ﻿using DataChannelOrtc.Signaling;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using Xamarin.Forms;
@@ -7,43 +8,76 @@ using Xamarin.Forms.Xaml;
 
 namespace DataChannelOrtc
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class ChatPage : ContentPage
-	{
-        public EventHandler TwoPeersConnected;
-        public event EventHandler MessageFromRemotePeer;
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class ChatPage : ContentPage
+    {
+        public  ObservableCollection<Message> _messages = new ObservableCollection<Message>();
 
-        public void OnTwoPeersConnected()
+        public event EventHandler RemotePeerConnected;
+        public event EventHandler RemotePeerDisconnected;
+        public event EventHandler<Message> SendMessageToRemotePeer;
+
+        private event EventHandler<Message> MessageFromRemotePeer;
+
+        public void HandleRemotePeerConnected()
         {
-            TwoPeersConnected?.Invoke(this, (null));
+            RemotePeerConnected?.Invoke(this, null);
+        }
 
+        public void HandleRemotePeerDisonnected()
+        {
+            RemotePeerDisconnected?.Invoke(this, null);
+        }
+
+        public void HandleMessageFromPeer(string message)
+        {
+            MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, LocalPeer, DateTime.Now, message));
+        }
+
+        private bool _isSendReady = false;
+        public bool IsSendReady
+        {
+            get { return _isSendReady; }
+            set { _isSendReady = value; }
+        }
+
+        public Peer LocalPeer { get; set; }
+        public Peer RemotePeer { get; set; }
+
+        public ChatPage(Peer localPeer, Peer remotePeer)
+        {
+            LocalPeer = localPeer;
+            RemotePeer = remotePeer;
+
+            InitializeComponent();
+
+            this.RemotePeerConnected += Signaler_RemoteConnected;
+            this.RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            this.MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+
+            InitView();
+        }
+
+        private void Signaler_RemoteConnected(object sender, EventArgs e)
+        {
+            IsSendReady = true;
             btnSend.IsEnabled = true;
         }
 
-        public void OnMessageFromRemotePeer()
+        private void Signaler_RemoteDisconnected(object sender, EventArgs e)
         {
-            MessageFromRemotePeer?.Invoke(this, (null));
-
-            if (MainPage._messages.Count > 0)
-            {
-                var target = MainPage._messages[MainPage._messages.Count - 1];
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    listMessages.ScrollTo(target, ScrollToPosition.End, true);
-                });
-            }
+            IsSendReady = false;
+            btnSend.IsEnabled = false;
         }
 
-        public ChatPage(Peer peer)
+        private void Signaler_MessageFromRemotePeer(object sender, Message message)
         {
-            InitializeComponent();
-
-            InitView(peer);
+            _messages.Add(new Message(DateTime.Now, RemotePeer, message.Text));
         }
 
-        private void InitView(Peer peer)
+        private void InitView()
         {
-            listMessages.ItemsSource = MainPage._messages;
+            listMessages.ItemsSource = _messages;
             entryMessage.Text = string.Empty;
             btnSend.IsEnabled = false;
 
@@ -53,43 +87,24 @@ namespace DataChannelOrtc
                 Orientation = StackOrientation.Vertical,
                 HorizontalOptions = LayoutOptions.Center,
                 Children =
-                {
-                    listMessages,
-                    slMessage
-                }
+                        {
+                            listMessages,
+                            slMessage
+                        }
             };
 
             btnSend.Clicked += (sender, args) =>
             {
-                if (MainPage._IsSendEnabled != false)
-                {
-                    if (entryMessage.Text != string.Empty)
-                    {
-                        string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
-                        MainPage._messages.Add(new Message(DateTime.Now.ToString("h:mm"), hostname + ": " + entryMessage.Text));
-
-                        if (MainPage._messages.Count > 0)
-                        {
-                            var target = MainPage._messages[MainPage._messages.Count - 1];
-                            Device.BeginInvokeOnMainThread(() =>
-                            {
-                                listMessages.ScrollTo(target, ScrollToPosition.End, true);
-                            });
-                        }
-
-                        MainPage._dataChannel.Send(entryMessage.Text);
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Message box is empty, write something...");
-                    }
-                    entryMessage.Text = string.Empty;
-                }
-                else
-                {
-                    Debug.Write("Please wait, connecting...");
-                }
+                var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
+                _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
+                OnSendMessageToRemotePeer(message);
             };
+
+        }
+
+        private void OnSendMessageToRemotePeer(Message message)
+        {
+            SendMessageToRemotePeer?.Invoke(this, message);
         }
     }
 }

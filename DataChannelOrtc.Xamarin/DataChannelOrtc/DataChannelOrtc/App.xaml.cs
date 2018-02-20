@@ -13,7 +13,7 @@ namespace DataChannelOrtc
 		{
 			InitializeComponent();
 
-			MainPage = new NavigationPage(new MainPage());
+			MainPage = new NavigationPage(new PeersListPage());
         }
 
 		protected override void OnStart ()
