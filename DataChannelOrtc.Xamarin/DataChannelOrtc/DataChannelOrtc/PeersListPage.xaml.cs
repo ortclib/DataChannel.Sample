@@ -161,20 +161,20 @@ namespace DataChannelOrtc
                 Orientation = StackOrientation.Vertical,
                 HorizontalOptions = LayoutOptions.Center,
                 Children =
+                {
+                    new StackLayout
                     {
-                        new StackLayout
+                        Orientation = StackOrientation.Horizontal,
+                        HorizontalOptions = LayoutOptions.CenterAndExpand,
+                        Children =
                         {
-                            Orientation = StackOrientation.Horizontal,
-                            HorizontalOptions = LayoutOptions.CenterAndExpand,
-                            Children =
-                            {
-                                ConnectPeer,
-                                DisconnectPeer
-                            }
-                        },
-                        peersListView,
-                        btnChat
-                    }
+                            ConnectPeer,
+                            DisconnectPeer
+                        }
+                    },
+                    peersListView,
+                    btnChat
+                }
             };
 
             ConnectPeer.Clicked += async (sender, args) =>
@@ -205,8 +205,6 @@ namespace DataChannelOrtc
 
                 _httpSignaler.SendToPeer(remotePeer.Id, "OpenDataChannel");
 
-                //await Navigation.PushAsync(new ChatPage(OrtcController.LocalPeer, remotePeer));
-
                 await SetupPeer(remotePeer, true);
             };
         }
@@ -214,17 +212,26 @@ namespace DataChannelOrtc
         private async Task SetupPeer(Peer remotePeer, bool isInitiator)
         {
             Tuple<OrtcController, ChatPage> tuple;
+            if (_chatSessions.TryGetValue(remotePeer.Id, out tuple))
+            {
+                Debug.WriteLine("Already have a page created!!!");
 
-            // No chat page created, create a new one
-            tuple = new Tuple<OrtcController, ChatPage>(null, new ChatPage(OrtcController.LocalPeer, remotePeer));
+            }
+            else
+            {
+                Debug.WriteLine("No chat page created!!!");
+                // No chat page created, create a new one
+                tuple = new Tuple<OrtcController, ChatPage>(null, new ChatPage(OrtcController.LocalPeer, remotePeer));
 
-            tuple.Item2.SendMessageToRemotePeer += ChatPage_SendMessageToRemotePeer;
+                tuple.Item2.SendMessageToRemotePeer += ChatPage_SendMessageToRemotePeer;
+            }
 
-            Device.BeginInvokeOnMainThread(async () => await Navigation.PushModalAsync(tuple.Item2));
+            Device.BeginInvokeOnMainThread(async () => await Navigation.PushAsync(tuple.Item2));
 
             // Create a new tuple and carry forward the chat page from the previous tuple 
             tuple = new Tuple<OrtcController, ChatPage>(new OrtcController(remotePeer, isInitiator), tuple.Item2);
             _chatSessions.Add(remotePeer.Id, tuple);
+
 
             tuple.Item1.DataChannelConnected += OrtcSignaler_OnDataChannelConnected;
             tuple.Item1.DataChannelDisconnected += OrtcSignaler_OnDataChannelDisconnected;

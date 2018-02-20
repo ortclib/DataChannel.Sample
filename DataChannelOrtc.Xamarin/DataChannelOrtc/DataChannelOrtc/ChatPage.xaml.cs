@@ -11,7 +11,7 @@ namespace DataChannelOrtc
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ChatPage : ContentPage
     {
-        public  ObservableCollection<Message> _messages = new ObservableCollection<Message>();
+        public ObservableCollection<Message> _messages = new ObservableCollection<Message>();
 
         public event EventHandler RemotePeerConnected;
         public event EventHandler RemotePeerDisconnected;
@@ -73,6 +73,9 @@ namespace DataChannelOrtc
         private void Signaler_MessageFromRemotePeer(object sender, Message message)
         {
             _messages.Add(new Message(DateTime.Now, RemotePeer, message.Text));
+
+            if (_messages.Count > 0)
+                ScrollMessages();
         }
 
         private void InitView()
@@ -87,24 +90,42 @@ namespace DataChannelOrtc
                 Orientation = StackOrientation.Vertical,
                 HorizontalOptions = LayoutOptions.Center,
                 Children =
-                        {
-                            listMessages,
-                            slMessage
-                        }
+                {
+                    listMessages,
+                    slMessage
+                }
             };
 
             btnSend.Clicked += (sender, args) =>
             {
-                var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
-                _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
-                OnSendMessageToRemotePeer(message);
-            };
+                if (entryMessage.Text != string.Empty)
+                {
+                    var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
+                    OnSendMessageToRemotePeer(message);
 
+                    _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
+
+                    if (_messages.Count > 0)
+                        ScrollMessages();
+                }
+                else
+                {
+                    Debug.WriteLine("Message box is empty, write something...");
+                }
+                entryMessage.Text = string.Empty;
+            };
         }
 
         private void OnSendMessageToRemotePeer(Message message)
         {
             SendMessageToRemotePeer?.Invoke(this, message);
+        }
+
+        private void ScrollMessages()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+                listMessages.ScrollTo(_messages[_messages.Count - 1], 
+                ScrollToPosition.End, true));
         }
     }
 }

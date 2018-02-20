@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DataChannelOrtc"
              x:Class="DataChannelOrtc.PeersListPage"
              Title="DataChannelOrtc.Xamarin"
              Padding="15,15,15,30"
@@ -21,8 +22,8 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30" />
-                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="35" />
+                                    <ColumnDefinition Width="195" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding Id}"
                                         Grid.Row="0"
