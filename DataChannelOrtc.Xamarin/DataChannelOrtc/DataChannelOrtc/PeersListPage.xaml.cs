@@ -183,7 +183,10 @@ namespace DataChannelOrtc
 
                 await _httpSignaler.Connect();
 
+                HttpSignaler._peers.Remove(p => p.Name == OrtcController.LocalPeer.Name);
+
                 ConnectPeer.IsEnabled = false;
+                ConnectPeer.BackgroundColor = Color.DarkGray;
                 DisconnectPeer.IsEnabled = true;
             };
 
@@ -194,6 +197,7 @@ namespace DataChannelOrtc
                 await _httpSignaler.SignOut();
 
                 DisconnectPeer.IsEnabled = false;
+                DisconnectPeer.BackgroundColor = Color.DarkGray;
                 ConnectPeer.IsEnabled = true;
             };
 

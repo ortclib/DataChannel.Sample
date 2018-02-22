@@ -83,6 +83,7 @@ namespace DataChannelOrtc
             listMessages.ItemsSource = _messages;
             entryMessage.Text = string.Empty;
             btnSend.IsEnabled = false;
+            btnSend.BackgroundColor = Color.DarkGray;
 
             // Page structure 
             Content = new StackLayout

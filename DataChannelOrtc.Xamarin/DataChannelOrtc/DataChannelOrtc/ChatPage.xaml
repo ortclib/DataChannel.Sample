@@ -7,6 +7,7 @@
              BackgroundColor="LightGray">
 
     <ContentPage.Content>
+        
         <StackLayout>
             <ListView x:Name="listMessages"
                       HasUnevenRows="True"
@@ -21,19 +22,26 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="45" />
-                                    <ColumnDefinition Width="195" />
+                                    <ColumnDefinition Width="35" />
+                                    <ColumnDefinition Width="205" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding Time}"
                                        Grid.Row="0"
                                        Grid.Column="0"
-                                       TextColor="Blue" />
+                                       TextColor="Blue"
+                                       Font="Bold"
+                                       FontSize="Small" />
                                 <Label Text="{Binding AuthorName}"
                                        Grid.Row="0"
-                                       Grid.Column="1" />
+                                       Grid.Column="1" 
+                                       Font="Bold" 
+                                       FontSize="Small"/>
                                 <Label Text="{Binding Text}"
                                        Grid.Row="1"
-                                       Grid.Column="1" />
+                                       Grid.Column="0" 
+                                       Grid.ColumnSpan="2"
+                                       TextColor="Black"
+                                       FontSize="Medium" />
                             </Grid>
                         </ViewCell>
                     </DataTemplate>
@@ -55,6 +63,7 @@
                         TextColor="White" />
             </StackLayout>
         </StackLayout>
+        
     </ContentPage.Content>
     
 </ContentPage>
