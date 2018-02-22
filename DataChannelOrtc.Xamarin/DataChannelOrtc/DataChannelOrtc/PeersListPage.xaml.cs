@@ -1,6 +1,7 @@
 ﻿using DataChannelOrtc.Signaling;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,8 @@ namespace DataChannelOrtc
     {
         private readonly HttpSignaler _httpSignaler;
         public HttpSignaler HttpSignaler => _httpSignaler;
+
+        ObservableCollection<Peer> PeersList = HttpSignaler._peers;
 
         Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions = new Dictionary<int, Tuple<OrtcController, ChatPage>>();
 
@@ -45,6 +48,8 @@ namespace DataChannelOrtc
 
         private void Signaler_SignedIn(object sender, EventArgs e)
         {
+            PeersList.Remove(p => p.Name == OrtcController.LocalPeer.Name);
+
             // The signaler will notify all events from the signaler
             // task thread. To prevent concurrency issues, ensure all
             // notifications from this thread are asynchronously
@@ -153,7 +158,7 @@ namespace DataChannelOrtc
 
         private void InitView()
         {
-            peersListView.ItemsSource = HttpSignaler._peers;
+            peersListView.ItemsSource = PeersList;
 
             // Page structure
             Content = new StackLayout
@@ -183,11 +188,10 @@ namespace DataChannelOrtc
 
                 await _httpSignaler.Connect();
 
-                HttpSignaler._peers.Remove(p => p.Name == OrtcController.LocalPeer.Name);
-
                 ConnectPeer.IsEnabled = false;
                 ConnectPeer.BackgroundColor = Color.DarkGray;
                 DisconnectPeer.IsEnabled = true;
+                DisconnectPeer.BackgroundColor = Color.Gray;
             };
 
             DisconnectPeer.Clicked += async (sender, args) =>
@@ -199,6 +203,7 @@ namespace DataChannelOrtc
                 DisconnectPeer.IsEnabled = false;
                 DisconnectPeer.BackgroundColor = Color.DarkGray;
                 ConnectPeer.IsEnabled = true;
+                ConnectPeer.BackgroundColor = Color.Gray;
             };
 
             btnChat.Clicked += async (sender, args) =>

@@ -62,20 +62,21 @@ namespace DataChannelOrtc
         {
             IsSendReady = true;
             btnSend.IsEnabled = true;
+            btnSend.BackgroundColor = Color.Gray;
         }
 
         private void Signaler_RemoteDisconnected(object sender, EventArgs e)
         {
             IsSendReady = false;
             btnSend.IsEnabled = false;
+            btnSend.BackgroundColor = Color.DarkGray;
         }
 
         private void Signaler_MessageFromRemotePeer(object sender, Message message)
         {
             _messages.Add(new Message(DateTime.Now, RemotePeer, message.Text));
 
-            if (_messages.Count > 0)
-                ScrollMessages();
+            ScrollMessages();
         }
 
         private void InitView()
@@ -99,20 +100,12 @@ namespace DataChannelOrtc
 
             btnSend.Clicked += (sender, args) =>
             {
-                if (entryMessage.Text != string.Empty)
-                {
-                    var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
-                    OnSendMessageToRemotePeer(message);
+                var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
+                OnSendMessageToRemotePeer(message);
 
-                    _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
+                _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
 
-                    if (_messages.Count > 0)
-                        ScrollMessages();
-                }
-                else
-                {
-                    Debug.WriteLine("Message box is empty, write something...");
-                }
+                ScrollMessages();
                 entryMessage.Text = string.Empty;
             };
         }
@@ -124,9 +117,12 @@ namespace DataChannelOrtc
 
         private void ScrollMessages()
         {
-            Device.BeginInvokeOnMainThread(() =>
-                listMessages.ScrollTo(_messages[_messages.Count - 1], 
-                ScrollToPosition.End, true));
+            if (_messages.Count > 0)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                    listMessages.ScrollTo(_messages[_messages.Count - 1],
+                    ScrollToPosition.End, true));
+            }
         }
     }
 }

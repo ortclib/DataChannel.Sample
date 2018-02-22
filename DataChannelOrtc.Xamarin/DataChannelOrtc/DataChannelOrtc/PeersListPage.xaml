@@ -27,7 +27,7 @@
                                 <Label Text="{Binding Id}"
                                         Grid.Row="0"
                                         Grid.Column="0"
-                                        TextColor="Blue" />
+                                        TextColor="Black" />
                                 <Label Text="{Binding Name}"
                                         Grid.Row="0"
                                         Grid.Column="1" />
