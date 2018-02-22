@@ -2,7 +2,7 @@
 
 namespace DataChannelOrtc.Signaling
 {
-    public abstract class OrtcContrllerEvents
+    public abstract class OrtcControllerEvents
     {
         public event EventHandler DataChannelConnected;
         public event EventHandler DataChannelDisconnected;

@@ -214,12 +214,13 @@ namespace DataChannelOrtc
             Tuple<OrtcController, ChatPage> tuple;
             if (_chatSessions.TryGetValue(remotePeer.Id, out tuple))
             {
-                Debug.WriteLine("Already have a page created!!!");
-
+                // Already have a page created
+                tuple.Item2.HandleRemotePeerDisonnected();
+                tuple.Item1.Dispose();
+                _chatSessions.Remove(remotePeer.Id);
             }
             else
             {
-                Debug.WriteLine("No chat page created!!!");
                 // No chat page created, create a new one
                 tuple = new Tuple<OrtcController, ChatPage>(null, new ChatPage(OrtcController.LocalPeer, remotePeer));
 
@@ -227,11 +228,10 @@ namespace DataChannelOrtc
             }
 
             Device.BeginInvokeOnMainThread(async () => await Navigation.PushAsync(tuple.Item2));
-
-            // Create a new tuple and carry forward the chat page from the previous tuple 
+            
+            // Create a new tuple and carry forward the chat page from the previous tuple
             tuple = new Tuple<OrtcController, ChatPage>(new OrtcController(remotePeer, isInitiator), tuple.Item2);
             _chatSessions.Add(remotePeer.Id, tuple);
-
 
             tuple.Item1.DataChannelConnected += OrtcSignaler_OnDataChannelConnected;
             tuple.Item1.DataChannelDisconnected += OrtcSignaler_OnDataChannelDisconnected;

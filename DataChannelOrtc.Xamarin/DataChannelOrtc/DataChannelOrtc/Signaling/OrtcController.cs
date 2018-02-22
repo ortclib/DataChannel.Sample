@@ -11,7 +11,9 @@ using System.Diagnostics;
 
 namespace DataChannelOrtc.Signaling
 {
-    public class OrtcController : OrtcContrllerEvents, IDisposable
+    public class OrtcController :
+        OrtcControllerEvents,
+        IDisposable
     {
         RTCIceGatherer _gatherer;
         RTCIceTransport _ice;   // Ice transport for the currently selected peer.
