@@ -19,8 +19,6 @@ namespace DataChannelOrtc
         private readonly HttpSignaler _httpSignaler;
         public HttpSignaler HttpSignaler => _httpSignaler;
 
-        ObservableCollection<Peer> PeersList = HttpSignaler._peers;
-
         Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions = new Dictionary<int, Tuple<OrtcController, ChatPage>>();
 
         static PeersListPage()
@@ -48,8 +46,6 @@ namespace DataChannelOrtc
 
         private void Signaler_SignedIn(object sender, EventArgs e)
         {
-            PeersList.Remove(p => p.Name == OrtcController.LocalPeer.Name);
-
             // The signaler will notify all events from the signaler
             // task thread. To prevent concurrency issues, ensure all
             // notifications from this thread are asynchronously
@@ -158,7 +154,7 @@ namespace DataChannelOrtc
 
         private void InitView()
         {
-            peersListView.ItemsSource = PeersList;
+            peersListView.ItemsSource = HttpSignaler._peers;
 
             // Page structure
             Content = new StackLayout

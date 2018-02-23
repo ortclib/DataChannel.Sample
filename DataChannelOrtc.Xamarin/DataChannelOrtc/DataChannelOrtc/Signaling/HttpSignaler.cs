@@ -19,6 +19,7 @@ namespace DataChannelOrtc.Signaling
         private readonly HttpClient _httpClient = new HttpClient();
         private State _state;
         private Uri _baseHttpAddress;
+        private Peer _myPeer;
         private int _myId;
         private string _clientName;
         public static ObservableCollection<Peer> _peers = new ObservableCollection<Peer>();
@@ -301,7 +302,13 @@ namespace DataChannelOrtc.Signaling
                     string peer_name = words[0];
                     int peer_id = words[1].ParseLeadingInt();
 
-                    _peers.Add(new Peer(peer_id, peer_name));
+                    Peer connectedPeer = new Peer(peer_id, peer_name);
+
+                    if (peer_name != OrtcController.LocalPeer.Name)
+                        _peers.Add(connectedPeer);
+                    else
+                        _myPeer = connectedPeer;
+
                     OnPeerConnected(new Peer(peer_id, peer_name));
                 }
             }
