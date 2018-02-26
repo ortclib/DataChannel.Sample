@@ -100,12 +100,15 @@ namespace DataChannelOrtc
 
             btnSend.Clicked += (sender, args) =>
             {
-                var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
-                OnSendMessageToRemotePeer(message);
+                if (entryMessage.Text != string.Empty)
+                {
+                    var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
+                    OnSendMessageToRemotePeer(message);
 
-                _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
+                    _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
 
-                ScrollMessages();
+                    ScrollMessages();
+                }
                 entryMessage.Text = string.Empty;
             };
         }
