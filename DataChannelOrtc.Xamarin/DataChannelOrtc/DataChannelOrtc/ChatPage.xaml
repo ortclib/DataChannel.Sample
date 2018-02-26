@@ -22,8 +22,8 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="205" />
-                                    <ColumnDefinition Width="35" />
+                                    <ColumnDefinition Width="200" />
+                                    <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding AuthorName}"
                                        Grid.Row="0"

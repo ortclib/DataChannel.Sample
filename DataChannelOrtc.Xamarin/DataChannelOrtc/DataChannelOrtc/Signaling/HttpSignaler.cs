@@ -160,8 +160,8 @@ namespace DataChannelOrtc.Signaling
 
                     if (content_length > 0)
                     {
-                        if (!ParseServerResponseAddPeersToList(result, status_code))
-                            return false;
+                        AddOrRemovePeerFromList(peer_name, peer_id, peer_connected);
+
                         OnSignedIn();
                     }
                 }
@@ -185,6 +185,30 @@ namespace DataChannelOrtc.Signaling
                 Debug.WriteLine("[Error] Signaling SendSignInRequestAsync: Failed to connect to server: " + ex.Message);
                 await SignOut();
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Add connected peer to the list, remove disconnected peer from the list
+        /// </summary>
+        private void AddOrRemovePeerFromList(string peer_name, int peer_id, int peer_connected)
+        {
+            var peer = new Peer(peer_id, peer_name);
+
+            if (peer_connected == 1)
+            {
+                if (peer_name != OrtcController.LocalPeer.Name)
+                    _peers.Add(peer);
+                else
+                    _myPeer = peer;
+
+                OnPeerConnected(peer);
+            }
+            else if (peer_connected == 0)
+            {
+                _peers.Remove(p => p.Id == peer_id);
+
+                OnPeerDisconnected(peer);
             }
         }
 
@@ -225,16 +249,7 @@ namespace DataChannelOrtc.Signaling
                                 out peer_name, out peer_id, out peer_connected))
                                 continue;
 
-                            // Add connected peer to the list, remove disconnected peer from the list
-                            if (peer_connected == 1)
-                                _peers.Add(new Peer(peer_id, peer_name));
-                            else if (peer_connected == 0)
-                                _peers.Remove(p => p.Id == peer_id);
-
-                            if (peer_connected == 1)
-                                OnPeerConnected(new Peer(peer_id, peer_name));
-                            else if (peer_connected == 0)
-                                OnPeerDisconnected(new Peer(peer_id, peer_name));
+                            AddOrRemovePeerFromList(peer_name, peer_id, peer_connected);
                         }
                         else
                         {
@@ -273,52 +288,6 @@ namespace DataChannelOrtc.Signaling
             string strPragma = pr.Substring(0, separator + 1);
 
             return strPragma.ParseLeadingInt();
-        }
-
-        private bool ParseServerResponseAddPeersToList(string content, HttpStatusCode status_code)
-        {
-            try
-            {
-                if (status_code != HttpStatusCode.OK)
-                {
-                    if (status_code == HttpStatusCode.InternalServerError)
-                    {
-                        Debug.WriteLine("[Error] Signaling ParseServerResponseSignIn: " + status_code);
-                        OnPeerDisconnected(new Peer(0, string.Empty));
-                        return false;
-                    }
-                    Close();
-                    _myId = -1;
-                    return false;
-                }
-                string[] separatingCharacter = { "\n" };
-                string[] stringPeer = content.Split(separatingCharacter, StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (string s in stringPeer)
-                {
-                    string[] separatingChars = { "," };
-                    string[] words = s.Split(separatingChars, StringSplitOptions.RemoveEmptyEntries);
-
-                    string peer_name = words[0];
-                    int peer_id = words[1].ParseLeadingInt();
-
-                    Peer connectedPeer = new Peer(peer_id, peer_name);
-
-                    if (peer_name != OrtcController.LocalPeer.Name)
-                        _peers.Add(connectedPeer);
-                    else
-                        _myPeer = connectedPeer;
-
-                    OnPeerConnected(new Peer(peer_id, peer_name));
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("[Error] Failed to parse server response (ex=" + ex.Message +
-                    ")! Content(" + content.Length + ")=<" + content + ">");
-                return false;
-            }
-            return true;
         }
 
         private bool ParseServerResponse(string content, HttpStatusCode status_code,
