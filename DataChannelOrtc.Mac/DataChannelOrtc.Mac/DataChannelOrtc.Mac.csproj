@@ -89,6 +89,9 @@
     <Compile Include="PeersTableDataSource.cs" />
     <Compile Include="PeersTableDelegate.cs" />
     <Compile Include="MacViewPeer.cs" />
+    <Compile Include="ChatTableDataSource.cs" />
+    <Compile Include="MacViewMessage.cs" />
+    <Compile Include="ChatTableDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Main.storyboard" />

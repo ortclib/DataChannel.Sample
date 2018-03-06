@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,10 @@ namespace DataChannelOrtc.Mac
 {
     public partial class ViewController : NSViewController
     {
+        public static ObservableCollection<MacViewMessage> _messages = new ObservableCollection<MacViewMessage>();
+
+        public event EventHandler<MacViewMessage> SendMessageToRemotePeer;
+
         private readonly HttpSignaler _httpSignaler;
         public HttpSignaler HttpSignaler => _httpSignaler;
 
@@ -65,15 +70,36 @@ namespace DataChannelOrtc.Mac
 
 		partial void SendMessageButtonClicked(NSObject sender)
 		{
-            var x = MessageTextField.StringValue;
+            var messageText = MessageTextField.StringValue;
+
+            if (messageText != string.Empty) 
+            {
+                var message = new MacViewMessage("Local peer: ", messageText);
+                _messages.Add(message);
+
+                var DataSource = new ChatTableDataSource();
+                _messages.ToList().ForEach(i => DataSource.Messages.Add(new MacViewMessage(i.Author, i.Text)));
+
+                // Populate the Chat Table 
+                ChatTable.DataSource = DataSource;
+                ChatTable.Delegate = new ChatTableDelegate(DataSource);
+
+                OnSendMessageToRemotePeer(message);
+            }
+
+            MessageTextField.StringValue = String.Empty;
 		}
 
-		partial void ChatButtonClicked(NSObject sender)
+		private void OnSendMessageToRemotePeer(MacViewMessage message)
+        {
+            SendMessageToRemotePeer?.Invoke(this, message);
+        }
+
+        partial void ChatButtonClicked(NSObject sender)
 		{
             var x = PeersTable.SelectedRow;
             if (x > -1) {
                 var p = HttpSignaler._peers[(int)x];
-                Debug.WriteLine("x: " + x + " p: " + p);
                 _httpSignaler.SendToPeer(p.Id, "OpenDataChannel");
             }
 		}
