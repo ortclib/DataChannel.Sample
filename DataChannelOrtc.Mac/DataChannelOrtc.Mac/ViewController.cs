@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AppKit;
@@ -62,9 +63,19 @@ namespace DataChannelOrtc.Mac
             await _httpSignaler.SignOut();
 		}
 
+		partial void SendMessageButtonClicked(NSObject sender)
+		{
+            var x = MessageTextField.StringValue;
+		}
+
 		partial void ChatButtonClicked(NSObject sender)
 		{
-            throw new NotImplementedException();
+            var x = PeersTable.SelectedRow;
+            if (x > -1) {
+                var p = HttpSignaler._peers[(int)x];
+                Debug.WriteLine("x: " + x + " p: " + p);
+                _httpSignaler.SendToPeer(p.Id, "OpenDataChannel");
+            }
 		}
 
 		public override void AwakeFromNib()

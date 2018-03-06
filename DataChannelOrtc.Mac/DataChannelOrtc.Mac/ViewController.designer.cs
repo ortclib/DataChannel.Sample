@@ -9,43 +9,78 @@ using System.CodeDom.Compiler;
 
 namespace DataChannelOrtc.Mac
 {
-	[Register ("ViewController")]
-	partial class ViewController
-	{
-		[Outlet]
-		AppKit.NSTableColumn PeerId { get; set; }
+    [Register ("ViewController")]
+    partial class ViewController
+    {
+        [Outlet]
+        AppKit.NSTableColumn ChatMessageAuthor { get; set; }
 
-		[Outlet]
-		AppKit.NSTableColumn PeerName { get; set; }
+        [Outlet]
+        AppKit.NSTableColumn ChatMessageText { get; set; }
 
-		[Outlet]
-		AppKit.NSTableView PeersTable { get; set; }
+        [Outlet]
+        AppKit.NSTableView ChatTable { get; set; }
 
-		[Action ("ChatButtonClicked:")]
-		partial void ChatButtonClicked (Foundation.NSObject sender);
+        [Outlet]
+        AppKit.NSTextField MessageTextField { get; set; }
 
-		[Action ("ConnectButtonClicked:")]
-		partial void ConnectButtonClicked (Foundation.NSObject sender);
+        [Outlet]
+        AppKit.NSTableColumn PeerId { get; set; }
 
-		[Action ("DisconnectButtonClicked:")]
-		partial void DisconnectButtonClicked (Foundation.NSObject sender);
-		
-		void ReleaseDesignerOutlets ()
-		{
-			if (PeerId != null) {
-				PeerId.Dispose ();
-				PeerId = null;
-			}
+        [Outlet]
+        AppKit.NSTableColumn PeerName { get; set; }
 
-			if (PeerName != null) {
-				PeerName.Dispose ();
-				PeerName = null;
-			}
+        [Outlet]
+        AppKit.NSTableView PeersTable { get; set; }
 
-			if (PeersTable != null) {
-				PeersTable.Dispose ();
-				PeersTable = null;
-			}
-		}
-	}
+        [Action ("ChatButtonClicked:")]
+        partial void ChatButtonClicked (Foundation.NSObject sender);
+
+        [Action ("ConnectButtonClicked:")]
+        partial void ConnectButtonClicked (Foundation.NSObject sender);
+
+        [Action ("DisconnectButtonClicked:")]
+        partial void DisconnectButtonClicked (Foundation.NSObject sender);
+
+        [Action ("SendMessageButtonClicked:")]
+        partial void SendMessageButtonClicked (Foundation.NSObject sender);
+        
+        void ReleaseDesignerOutlets ()
+        {
+            if (PeerId != null) {
+                PeerId.Dispose ();
+                PeerId = null;
+            }
+
+            if (PeerName != null) {
+                PeerName.Dispose ();
+                PeerName = null;
+            }
+
+            if (PeersTable != null) {
+                PeersTable.Dispose ();
+                PeersTable = null;
+            }
+
+            if (ChatTable != null) {
+                ChatTable.Dispose ();
+                ChatTable = null;
+            }
+
+            if (ChatMessageAuthor != null) {
+                ChatMessageAuthor.Dispose ();
+                ChatMessageAuthor = null;
+            }
+
+            if (ChatMessageText != null) {
+                ChatMessageText.Dispose ();
+                ChatMessageText = null;
+            }
+
+            if (MessageTextField != null) {
+                MessageTextField.Dispose ();
+                MessageTextField = null;
+            }
+        }
+    }
 }

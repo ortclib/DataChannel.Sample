@@ -13,7 +13,12 @@ namespace DataChannelOrtc.Mac
             this.DataSource = datasource;
         }
 
-        public override NSView GetViewForItem(NSTableView tableView, NSTableColumn tableColumn, nint row)
+		public override bool ShouldSelectRow(NSTableView tableView, nint row)
+		{
+            return true;
+		}
+
+		public override NSView GetViewForItem(NSTableView tableView, NSTableColumn tableColumn, nint row)
         {
             NSTextField view = (NSTextField)tableView.MakeView(CellIdentifier, this);
             if (view == null)
