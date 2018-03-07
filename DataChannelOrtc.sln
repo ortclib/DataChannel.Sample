@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataChannelOrtc.iOS", "DataChannelOrtc\DataChannelOrtc.iOS\DataChannelOrtc.iOS.csproj", "{81C511DA-15C6-4D70-9DBA-4DC52A17C5BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataChannelOrtc.iOS", "DataChannelOrtc.Xamarin\DataChannelOrtc.iOS\DataChannelOrtc.iOS.csproj", "{81C511DA-15C6-4D70-9DBA-4DC52A17C5BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataChannelOrtc", "DataChannelOrtc\DataChannelOrtc\DataChannelOrtc.csproj", "{BCD618BB-FDBF-472B-AF6D-4E44CE533EA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataChannelOrtc", "DataChannelOrtc.Xamarin\DataChannelOrtc\DataChannelOrtc.csproj", "{BCD618BB-FDBF-472B-AF6D-4E44CE533EA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
