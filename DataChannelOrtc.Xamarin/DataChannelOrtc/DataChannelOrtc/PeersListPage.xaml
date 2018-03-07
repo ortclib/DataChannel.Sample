@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DataChannelOrtc.PeersListPage"
+             Title="DataChannelOrtc.Xamarin"
+             Padding="15,15,15,30"
+             BackgroundColor="LightGray">
+
+    <ContentPage.Content>
+        
+        <StackLayout>
+            <ListView x:Name="peersListView"
+                        HasUnevenRows="True"
+                        BackgroundColor="White"
+                        Margin="10">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid Padding="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="35" />
+                                    <ColumnDefinition Width="195" />
+                                </Grid.ColumnDefinitions>
+                                <Label Text="{Binding Id}"
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        TextColor="Black" />
+                                <Label Text="{Binding Name}"
+                                        Grid.Row="0"
+                                        Grid.Column="1" />
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button x:Name="ConnectPeer"
+                    Text=" Connect  " 
+                    WidthRequest="100"
+                    HeightRequest="60"
+                    BackgroundColor="Gray" 
+                    TextColor="White"
+                    FontSize="Medium" />
+            <Button x:Name="DisconnectPeer"
+                    Text="Disconnect" 
+                    WidthRequest="100"
+                    HeightRequest="60"
+                    BackgroundColor="Gray" 
+                    TextColor="White"
+                    FontSize="Medium" />
+            <Button x:Name="btnChat"
+                    Text="Chat"
+                    HeightRequest="60"
+                    BackgroundColor="Gray"
+                    TextColor="White"
+                    FontSize="Medium" 
+                    Margin="10,0,10,0"/>
+        </StackLayout>
+        
+    </ContentPage.Content>
+    
+</ContentPage>
