@@ -1,9 +1,7 @@
-﻿using DataChannel.Net.Signaling;
+﻿using DataChannelOrtc.Signaling;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -274,7 +272,7 @@ namespace DataChannel.Net
             _chatSessions.Add(remotePeer.Id, tuple);
 
             tuple.Item1.DataChannelConnected += OrtcSignaler_OnDataChannelConnected;
-            tuple.Item1.DataChannelDisonnected += OrtcSignaler_OnDataChannelDisconnected;
+            tuple.Item1.DataChannelDisconnected += OrtcSignaler_OnDataChannelDisconnected;
             tuple.Item1.SignalMessageToPeer += OrtcSignaler_OnSignalMessageToPeer;
             tuple.Item1.DataChannelMessage += OrtcSignaler_OnDataChannelMessage;
 

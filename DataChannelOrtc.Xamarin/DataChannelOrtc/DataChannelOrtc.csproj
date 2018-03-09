@@ -13,6 +13,24 @@
     <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="App.xaml.cs">
       <DependentUpon>*.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\HttpSignaler.cs">
+        <Link>HttpSignaler.cs</Link>
+      </Compile>
+	  <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\HttpSignalerEvents.cs">
+        <Link>HttpSignalerEvents.cs</Link>
+      </Compile>
+	  <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\OrtcController.cs">
+        <Link>OrtcController.cs</Link>
+      </Compile>
+	  <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\OrtcControllerEvents.cs">
+        <Link>OrtcControllerEvents.cs</Link>
+      </Compile>
+	  <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\Peer.cs">
+        <Link>Peer.cs</Link>
+      </Compile>
+	  <Compile Include="$(MSBuildThisFileDirectory)..\..\Signaling\Util.cs">
+        <Link>Util.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
