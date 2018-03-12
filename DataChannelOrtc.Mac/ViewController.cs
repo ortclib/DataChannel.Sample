@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using AppKit;
@@ -12,13 +13,18 @@ namespace DataChannelOrtc.Mac
 {
     public partial class ViewController : NSViewController
     {
-        public Peer LocalPeer { get; set; }
         public Peer RemotePeer { get; set; }
         public static ObservableCollection<MacViewMessage> _messages = new ObservableCollection<MacViewMessage>();
 
         public event EventHandler<MacViewMessage> SendMessageToRemotePeer;
         private event EventHandler<MacViewMessage> MessageFromRemotePeer;
+        public event EventHandler RemotePeerConnected;
         public event EventHandler RemotePeerDisconnected;
+
+        public void HandleRemotePeerConnected()
+        {
+            RemotePeerConnected?.Invoke(this, null);
+        }
 
         public void HandleRemotePeerDisconnected()
         {
@@ -164,7 +170,7 @@ namespace DataChannelOrtc.Mac
             _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
         }
 
-        private void OrtcController_OnDataChannelDisconnected(object sender, EventArgs message)
+        private void OrtcController_OnDataChannelDisconnected(object sender, EventArgs e)
         {
             OrtcController signaler = (OrtcController)sender;
             Debug.WriteLine($"Remote peer disconnected: {signaler.RemotePeer.Id}");
@@ -174,7 +180,10 @@ namespace DataChannelOrtc.Mac
 
         private void OrtcController_OnDataChannelConnected(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            OrtcController signaler = (OrtcController)sender;
+            Debug.WriteLine($"Remote peer connected: {signaler.RemotePeer.Id}");
+
+            HandleRemotePeerConnected();
         }
 
         public override void ViewDidLoad()
@@ -210,10 +219,11 @@ namespace DataChannelOrtc.Mac
 		partial void SendMessageButtonClicked(NSObject sender)
 		{
             var messageText = MessageTextField.StringValue;
-
+            string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
+            string peerName = hostname != null ? hostname : "<unknown host>";
             if (messageText != string.Empty) 
             {
-                var message = new MacViewMessage("Local peer: ", messageText);
+                var message = new MacViewMessage(peerName, messageText);
                 _messages.Add(message);
 
                 var DataSource = new ChatTableDataSource();
