@@ -168,11 +168,11 @@ namespace DataChannelOrtc.Mac.Signaling
             }
         }
 
-        //public async Task SetupAsync()
-        //{
-        //    await InitializeORTC();
-        //    OpenDataChannel();
-        //}
+        public async Task SetupAsync()
+        {
+            await InitializeORTC();
+            OpenDataChannel();
+        }
 
         //public void HandleSendMessageViaDataChannel(string message)
         //{
@@ -262,8 +262,8 @@ namespace DataChannelOrtc.Mac.Signaling
         //    }
         //}
 
-        //private async Task InitializeORTC()
-        //{
+        private async Task InitializeORTC()
+        {
         //    var gatherOptions = new RTCIceGatherOptions()
         //    {
         //        IceServers = new List<RTCIceServer>()
@@ -299,13 +299,13 @@ namespace DataChannelOrtc.Mac.Signaling
         //    _sctp = new RTCSctpTransport(_dtls);
 
         //    _gatherer.Gather(null);
-        //}
+        }
 
         ///// <summary>
         ///// Establishes a DataChannel with the parameter peer.
         ///// </summary>
-        //private void OpenDataChannel()
-        //{
+        private void OpenDataChannel()
+        {
         //    Debug.WriteLine($"Opening data channel to peer id: {RemotePeer.Id}");
 
         //    var iceParams = _gatherer.LocalParameters;
@@ -319,7 +319,7 @@ namespace DataChannelOrtc.Mac.Signaling
         //    }
         //    var dtlsParams = _dtls.LocalParameters;
         //    OnSignalMessageToPeer(dtlsParams.ToJson().ToString());
-        //}
+        }
 
         //private void IceGatherer_OnStateChange(RTCIceGathererStateChangeEvent evt)
         //{
