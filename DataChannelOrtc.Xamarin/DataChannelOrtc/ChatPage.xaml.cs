@@ -24,7 +24,7 @@ namespace DataChannelOrtc
             RemotePeerConnected?.Invoke(this, null);
         }
 
-        public void HandleRemotePeerDisonnected()
+        public void HandleRemotePeerDisconnected()
         {
             RemotePeerDisconnected?.Invoke(this, null);
         }

@@ -220,7 +220,7 @@ namespace DataChannelOrtc
             if (_chatSessions.TryGetValue(remotePeer.Id, out tuple))
             {
                 // Already have a page created
-                tuple.Item2.HandleRemotePeerDisonnected();
+                tuple.Item2.HandleRemotePeerDisconnected();
                 tuple.Item1.Dispose();
                 _chatSessions.Remove(remotePeer.Id);
             }
@@ -275,7 +275,7 @@ namespace DataChannelOrtc
             Tuple<OrtcController, ChatPage> tuple;
             if (_chatSessions.TryGetValue(signaler.RemotePeer.Id, out tuple))
             {
-                tuple.Item2.HandleRemotePeerDisonnected();
+                tuple.Item2.HandleRemotePeerDisconnected();
             }
         }
 
