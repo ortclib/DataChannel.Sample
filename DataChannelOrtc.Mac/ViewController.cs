@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using AppKit;
@@ -219,11 +218,10 @@ namespace DataChannelOrtc.Mac
 		partial void SendMessageButtonClicked(NSObject sender)
 		{
             var messageText = MessageTextField.StringValue;
-            string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
-            string peerName = hostname != null ? hostname : "<unknown host>";
+
             if (messageText != string.Empty) 
             {
-                var message = new MacViewMessage(peerName, messageText);
+                var message = new MacViewMessage(OrtcController.LocalPeer.Name, messageText);
                 _messages.Add(message);
 
                 var DataSource = new ChatTableDataSource();
