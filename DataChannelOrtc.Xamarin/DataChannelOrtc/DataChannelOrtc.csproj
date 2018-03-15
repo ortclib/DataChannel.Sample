@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ORTC.Xamarin" Version="1.62.0.200-Alpha" />
+    <PackageReference Include="ORTC.Xamarin" Version="1.62.0.14-Alpha" />
     <PackageReference Include="Xamarin.Forms" Version="2.5.0.121934" />
   </ItemGroup>
 
