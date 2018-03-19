@@ -1,8 +1,6 @@
 ﻿using DataChannelOrtc.Signaling;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Net.NetworkInformation;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,7 +14,6 @@ namespace DataChannelOrtc
         public event EventHandler RemotePeerConnected;
         public event EventHandler RemotePeerDisconnected;
         public event EventHandler<Message> SendMessageToRemotePeer;
-
         private event EventHandler<Message> MessageFromRemotePeer;
 
         public void HandleRemotePeerConnected()
@@ -51,9 +48,9 @@ namespace DataChannelOrtc
 
             InitializeComponent();
 
-            this.RemotePeerConnected += Signaler_RemoteConnected;
-            this.RemotePeerDisconnected += Signaler_RemoteDisconnected;
-            this.MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+            RemotePeerConnected += Signaler_RemoteConnected;
+            RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
 
             InitView();
         }
@@ -102,8 +99,7 @@ namespace DataChannelOrtc
             {
                 if (entryMessage.Text != string.Empty)
                 {
-                    var message = new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text);
-                    OnSendMessageToRemotePeer(message);
+                    OnSendMessageToRemotePeer(new Message(LocalPeer, RemotePeer, DateTime.Now, entryMessage.Text));
 
                     _messages.Add(new Message(DateTime.Now, LocalPeer, entryMessage.Text));
 

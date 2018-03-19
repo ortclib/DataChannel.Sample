@@ -9,7 +9,6 @@ namespace DataChannel.Net
         public event EventHandler RemotePeerConnected;
         public event EventHandler RemotePeerDisconnected;
         public event EventHandler<Message> SendMessageToRemotePeer;
-
         private event EventHandler<Message> MessageFromRemotePeer;
 
         public void HandleRemotePeerConnected()
@@ -80,7 +79,6 @@ namespace DataChannel.Net
                 lstMessages.Items.Add(message);
                 OnSendMessageToRemotePeer(message);
             }
-
             txtMessage.Text = string.Empty;
         }
 

@@ -1,13 +1,9 @@
 ﻿using DataChannelOrtc.Signaling;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,11 +15,8 @@ namespace DataChannelOrtc
         private readonly HttpSignaler _httpSignaler;
         public HttpSignaler HttpSignaler => _httpSignaler;
 
-        Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions = new Dictionary<int, Tuple<OrtcController, ChatPage>>();
-
-        static PeersListPage()
-        {
-        }
+        Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions = 
+            new Dictionary<int, Tuple<OrtcController, ChatPage>>();
 
         public PeersListPage()
         {
@@ -125,7 +118,7 @@ namespace DataChannelOrtc
                 // on a task from the GUI thread - ever!
                 HandleMessageFromPeer(sender, @event).ContinueWith((antecedent) =>
                 {
-                    Debug.WriteLine("Message from peer handled: " + @event.Message);
+                    Debug.WriteLine($"Message from peer handled: {@event.Message}");
                     complete.Set();
                 });
             });
@@ -145,10 +138,9 @@ namespace DataChannelOrtc
             Tuple<OrtcController, ChatPage> tuple;
             if (!_chatSessions.TryGetValue(peer.Id, out tuple))
             {
-                Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / " + message);
+                Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / {message}");
                 return;
             }
-
             await tuple.Item1.HandleMessageFromPeer(message);
         }
 
@@ -180,7 +172,7 @@ namespace DataChannelOrtc
 
             ConnectPeer.Clicked += async (sender, args) =>
             {
-                Debug.WriteLine("Connects to server!");
+                Debug.WriteLine("Connects to server.");
 
                 await _httpSignaler.Connect();
 
@@ -192,7 +184,7 @@ namespace DataChannelOrtc
 
             DisconnectPeer.Clicked += async (sender, args) =>
             {
-                Debug.WriteLine("Disconnects from server!");
+                Debug.WriteLine("Disconnects from server.");
 
                 await _httpSignaler.SignOut();
 
@@ -205,11 +197,9 @@ namespace DataChannelOrtc
             btnChat.Clicked += async (sender, args) =>
             {
                 Peer remotePeer = peersListView.SelectedItem as Peer;
-                if (remotePeer == null)
-                    return;
+                if (remotePeer == null) return;
 
                 _httpSignaler.SendToPeer(remotePeer.Id, "OpenDataChannel");
-
                 await SetupPeer(remotePeer, true);
             };
         }
@@ -249,7 +239,7 @@ namespace DataChannelOrtc
         private void OrtcSignaler_OnDataChannelMessage(object sender, string message)
         {
             OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: " + message);
+            Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: {message}");
 
             _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
 
@@ -263,7 +253,8 @@ namespace DataChannelOrtc
         private void OrtcSignaler_OnSignalMessageToPeer(object sender, string message)
         {
             OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Send message to remote peer {signaler.RemotePeer.Id}: " + message);
+            Debug.WriteLine($"Send message to remote peer {signaler.RemotePeer.Id}: {message}");
+
             _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message); 
         }
 
@@ -293,8 +284,7 @@ namespace DataChannelOrtc
 
         private void ChatPage_SendMessageToRemotePeer(object sender, Message message)
         {
-            ChatPage page = (ChatPage)sender;
-            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: " + message.Text);
+            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: {message.Text}");
 
             Tuple<OrtcController, ChatPage> tuple;
             if (_chatSessions.TryGetValue(message.Recipient.Id, out tuple))

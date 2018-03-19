@@ -13,11 +13,8 @@ namespace DataChannel.Net
         private readonly HttpSignaler _httpSignaler;
         public HttpSignaler HttpSignaler => _httpSignaler;
 
-        Dictionary<int, Tuple<OrtcController, ChatForm> > _chatSessions = new Dictionary<int, Tuple<OrtcController, ChatForm> >();
-
-        static PeersListForm()
-        {
-        }
+        Dictionary<int, Tuple<OrtcController, ChatForm>> _chatSessions = 
+            new Dictionary<int, Tuple<OrtcController, ChatForm>>();
 
         public PeersListForm()
         {
@@ -59,7 +56,7 @@ namespace DataChannel.Net
             // task thread. To prevent concurrency issues, ensure all
             // notifications from this thread are asynchronously
             // forwarded back to the GUI thread for further processing.
-            this.BeginInvoke((Action)(() => { HandleSignedIn(sender, e); }));
+            this.BeginInvoke((Action)(() => HandleSignedIn(sender, e)));
         }
 
         private void HandleSignedIn(object sender, EventArgs e)
@@ -70,7 +67,7 @@ namespace DataChannel.Net
         private void Signaler_ServerConnectionFailed(object sender, EventArgs e)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => { HandleServerConnectionFailed(sender, e); }));
+            this.BeginInvoke((Action)(() => HandleServerConnectionFailed(sender, e)));
         }
 
         private void HandleServerConnectionFailed(object sender, EventArgs e)
@@ -81,32 +78,31 @@ namespace DataChannel.Net
         private void Signaler_PeerConnected(object sender, Peer peer)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => { HandlePeerConnected(sender, peer); }));
+            this.BeginInvoke((Action)(() => HandlePeerConnected(sender, peer)));
         }
 
         private void HandlePeerConnected(object sender, Peer peer)
         {
             Debug.WriteLine($"Peer connected {peer.Name} / {peer.Id}");
 
-            var found = lstPeers.FindString(peer.ToString());
-            if (ListBox.NoMatches != found)
+            if (ListBox.NoMatches != lstPeers.FindString(peer.ToString()))
             {
-                Debug.WriteLine("Peer already found in list: " + peer.ToString());
+                Debug.WriteLine($"Peer already found in list: {peer.ToString()}");
                 return;
             }
 
-            if (OrtcController.LocalPeer.Name == peer.Name) {
-                Debug.WriteLine("Peer is our local peer: " + peer.ToString());
+            if (OrtcController.LocalPeer.Name == peer.Name)
+            {
+                Debug.WriteLine($"Peer is our local peer: {peer.ToString()}");
                 return;
             }
-
             lstPeers.Items.Add(peer.ToString());
         }
 
         private void Signaler_PeerDisconnected(object sender, Peer peer)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => { HandlePeerDisconnected(sender, peer); }));
+            this.BeginInvoke((Action)(() => HandlePeerDisconnected(sender, peer)));
         }
 
         private void HandlePeerDisconnected(object sender, Peer peer)
@@ -114,11 +110,11 @@ namespace DataChannel.Net
             Debug.WriteLine($"Peer disconnected {peer.Name} / {peer.Id}");
 
             var found = lstPeers.FindString(peer.ToString());
-            if (ListBox.NoMatches != found) {
-                Debug.WriteLine("Peer not found in list: " + peer.ToString());
+            if (ListBox.NoMatches != found)
+            {
+                Debug.WriteLine($"Peer not found in list: {peer.ToString()}");
                 return;
             }
-
             lstPeers.Items.RemoveAt(found);
         }
 
@@ -133,7 +129,7 @@ namespace DataChannel.Net
             // events must be processed exactly one at a time and the next
             // message from the server should be held back until the current
             // message is fully processed.
-            var asyncResult = this.BeginInvoke((Action)(() =>
+            this.BeginInvoke((Action)(() =>
             {
                 // Do not invoke a .Wait() on the task result of
                 // HandleMessageFromPeer! While this might seem as a
@@ -156,7 +152,7 @@ namespace DataChannel.Net
                 // on a task from the GUI thread - ever!
                 HandleMessageFromPeer(sender, @event).ContinueWith((antecedent) =>
                 {
-                    Debug.WriteLine("Message from peer handled: " + @event.Message);
+                    Debug.WriteLine($"Message from peer handled: {@event.Message}");
                     complete.Set();
                 });
             }));
@@ -193,10 +189,9 @@ namespace DataChannel.Net
             Tuple<OrtcController, ChatForm> tuple;
             if (!_chatSessions.TryGetValue(peer.Id, out tuple))
             {
-                Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / " + message);
+                Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / {message}");
                 return;
             }
-
             await tuple.Item1.HandleMessageFromPeer(message);
         }
 
@@ -306,14 +301,15 @@ namespace DataChannel.Net
         private void OrtcSignaler_OnSignalMessageToPeer(object sender, string message)
         {
             OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Send message to remote peer {signaler.RemotePeer.Id}: " + message);
+            Debug.WriteLine($"Send message to remote peer {signaler.RemotePeer.Id}: {message}");
+
             _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
         }
 
         private void OrtcSignaler_OnDataChannelMessage(object sender, string message)
         {
             OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: " + message);
+            Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: {message}");
 
             _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
 
@@ -326,8 +322,7 @@ namespace DataChannel.Net
 
         private void ChatForm_SendMessageToRemotePeer(object sender, Message message)
         {
-            ChatForm form = (ChatForm)sender;
-            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: " + message.Text);
+            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: {message.Text}");
 
             Tuple<OrtcController, ChatForm> tuple;
             if (_chatSessions.TryGetValue(message.Recipient.Id, out tuple))
@@ -338,7 +333,7 @@ namespace DataChannel.Net
 
         private async void btnConnect_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("Connects to server!");
+            Debug.WriteLine("Connects to server.");
 
             await HttpSignaler.Connect();
 
@@ -348,11 +343,11 @@ namespace DataChannel.Net
 
         private async void btnDisconnect_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine("Disconnects from server!");
+            Debug.WriteLine("Disconnects from server.");
 
             await _httpSignaler.SignOut();
-            lstPeers.Items.Clear();
 
+            lstPeers.Items.Clear();
             btnDisconnect.Enabled = false;
             btnConnect.Enabled = true;
         }
@@ -361,14 +356,10 @@ namespace DataChannel.Net
         {
             if (lstPeers.SelectedIndex == -1)
             {
-                MessageBox.Show("Please select a peer!");
+                MessageBox.Show("Please select a peer.");
                 return;
-
             }
-
-            string text = lstPeers.GetItemText(lstPeers.SelectedItem);
-
-            Peer remotePeer = Peer.CreateFromString(text);
+            Peer remotePeer = Peer.CreateFromString(lstPeers.GetItemText(lstPeers.SelectedItem));
 
             _httpSignaler.SendToPeer(remotePeer.Id, "OpenDataChannel");
             await SetupPeer(remotePeer, true);
