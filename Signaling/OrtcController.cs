@@ -11,6 +11,16 @@ using System.Diagnostics;
 
 namespace DataChannelOrtc.Signaling
 {
+#region IceServersConfig
+    static class IceServerConfig
+    {
+        public static string StunUrl = "stun.l.google.com:19302";
+        public static string TurnUrl = "turn:turn-testdrive.cloudapp.net:3478?transport=udp";
+        public static string TurnUsername = "redmond";
+        public static string TurnCredential = "redmond123";
+    }
+#endregion
+
     public class OrtcController :
         OrtcControllerEvents,
         IDisposable
@@ -269,10 +279,17 @@ namespace DataChannelOrtc.Signaling
             {
                 IceServers = new List<RTCIceServer>()
                 {
-                    new RTCIceServer { Urls = new string[] { "stun.l.google.com:19302" } },
-                    new RTCIceServer { Username = "redmond", Credential = "redmond123",
+                    new RTCIceServer
+                    {
+                        Urls = new string[] { IceServerConfig.StunUrl }
+                    },
+                    new RTCIceServer
+                    {
+                        Username = IceServerConfig.TurnUsername,
+                        Credential = IceServerConfig.TurnCredential,
                         CredentialType = RTCIceCredentialType.Password,
-                        Urls = new string[] { "turn:turn-testdrive.cloudapp.net:3478?transport=udp" } }
+                        Urls = new string[] { IceServerConfig.TurnUrl }
+                    }
                 }
             };
 
@@ -289,12 +306,13 @@ namespace DataChannelOrtc.Signaling
                 OnSignalMessageToPeer(@event.Candidate.ToJson().ToString());
             };
 
-            var cert = await RTCCertificate.GenerateCertificate();
-
             _ice = new RTCIceTransport(_gatherer);
             _ice.OnStateChange += IceTransport_OnStateChange;
 
-            _dtls = new RTCDtlsTransport(_ice, new RTCCertificate[] { cert });
+            _dtls = new RTCDtlsTransport(_ice, new RTCCertificate[] 
+            {
+                await RTCCertificate.GenerateCertificate()
+            });
             _dtls.OnStateChange += Dtls_OnStateChange;
 
             _sctp = new RTCSctpTransport(_dtls);

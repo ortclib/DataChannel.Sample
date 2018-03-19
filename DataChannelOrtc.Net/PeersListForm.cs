@@ -22,11 +22,7 @@ namespace DataChannel.Net
 
             lstPeers.SelectedIndex = -1;
 
-            var name = OrtcController.LocalPeer.Name;
-            Debug.WriteLine($"Connecting to server from local peer: {name}");
-
-            _httpSignaler =
-                new HttpSignaler("peercc-server.ortclib.org", 8888, name);
+            _httpSignaler = new HttpSignaler();
 
             _httpSignaler.SignedIn += Signaler_SignedIn;
             _httpSignaler.ServerConnectionFailed += Signaler_ServerConnectionFailed;

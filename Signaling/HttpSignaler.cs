@@ -15,6 +15,11 @@ namespace DataChannelOrtc.Signaling
     /// </summary>
     public class HttpSignaler : HttpSignalerEvents
     {
+#region SignalingServerConfig
+        private static string Url = "http://peercc-server.ortclib.org";
+        private static int Port = 8888;
+#endregion
+
         private readonly HttpClient _httpClient = new HttpClient();
         private State _state;
         private Uri _baseHttpAddress;
@@ -31,12 +36,12 @@ namespace DataChannelOrtc.Signaling
         /// <param name="server">Host name/IP.</param>
         /// <param name="port">Port to connect.</param>
         /// <param name="client_name">Client name.</param>
-        public HttpSignaler(string server, int port, string client_name)
+        public HttpSignaler()
         {
             _state = State.NotConnected;
             _myId = -1;
-            _clientName = client_name;
-            _baseHttpAddress = new Uri("http://" + server + ":" + port);
+            _clientName = OrtcController.LocalPeer.Name;
+            _baseHttpAddress = new Uri(Url + ":" + Port);
         }
 
         /// <summary>
