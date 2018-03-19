@@ -56,7 +56,7 @@ namespace DataChannel.Net
             // task thread. To prevent concurrency issues, ensure all
             // notifications from this thread are asynchronously
             // forwarded back to the GUI thread for further processing.
-            this.BeginInvoke((Action)(() => HandleSignedIn(sender, e)));
+            BeginInvoke((Action)(() => HandleSignedIn(sender, e)));
         }
 
         private void HandleSignedIn(object sender, EventArgs e)
@@ -67,7 +67,7 @@ namespace DataChannel.Net
         private void Signaler_ServerConnectionFailed(object sender, EventArgs e)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => HandleServerConnectionFailed(sender, e)));
+            BeginInvoke((Action)(() => HandleServerConnectionFailed(sender, e)));
         }
 
         private void HandleServerConnectionFailed(object sender, EventArgs e)
@@ -78,7 +78,7 @@ namespace DataChannel.Net
         private void Signaler_PeerConnected(object sender, Peer peer)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => HandlePeerConnected(sender, peer)));
+            BeginInvoke((Action)(() => HandlePeerConnected(sender, peer)));
         }
 
         private void HandlePeerConnected(object sender, Peer peer)
@@ -102,7 +102,7 @@ namespace DataChannel.Net
         private void Signaler_PeerDisconnected(object sender, Peer peer)
         {
             // See method Signaler_SignedIn for concurrency comments.
-            this.BeginInvoke((Action)(() => HandlePeerDisconnected(sender, peer)));
+            BeginInvoke((Action)(() => HandlePeerDisconnected(sender, peer)));
         }
 
         private void HandlePeerDisconnected(object sender, Peer peer)
@@ -121,7 +121,7 @@ namespace DataChannel.Net
         private void Signaler_MessageFromPeer(object sender, HttpSignalerMessageEvent @event)
         {
             var complete = new ManualResetEvent(false);
-            
+
             // Exactly like the case of Signaler_SignedIn, this event is fired
             // from the signaler task thread and like the other events,
             // the message must be processed on the GUI thread for concurrency
@@ -129,7 +129,7 @@ namespace DataChannel.Net
             // events must be processed exactly one at a time and the next
             // message from the server should be held back until the current
             // message is fully processed.
-            this.BeginInvoke((Action)(() =>
+            BeginInvoke((Action)(() =>
             {
                 // Do not invoke a .Wait() on the task result of
                 // HandleMessageFromPeer! While this might seem as a
@@ -183,7 +183,7 @@ namespace DataChannel.Net
             if (message.StartsWith("OpenDataChannel"))
             {
                 Debug.WriteLine("contains OpenDataChannel");
-                SetupPeer(peer, false);
+                await SetupPeer(peer, false);
             }
 
             Tuple<OrtcController, ChatForm> tuple;
@@ -192,7 +192,7 @@ namespace DataChannel.Net
                 Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / {message}");
                 return;
             }
-            await tuple.Item1.HandleMessageFromPeer(message);
+            tuple.Item1.HandleMessageFromPeer(message);
         }
 
         private async Task SetupPeer(Peer remotePeer, bool isInitiator)
@@ -246,7 +246,7 @@ namespace DataChannel.Net
                 // task. This allows the GUI to be displayed and events are
                 // processed as normal including other signaler messages
                 // from peers.
-                this.BeginInvoke((Action)(() =>
+                BeginInvoke((Action)(() =>
                 {
                     if (Properties.Settings.Default.MultipleConnections)
                     {

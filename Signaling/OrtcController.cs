@@ -40,7 +40,8 @@ namespace DataChannelOrtc.Signaling
 
         static readonly Peer _localPeer = new Func<Peer>(() =>
         {
-            string hostname = IPGlobalProperties.GetIPGlobalProperties().HostName;
+            string host = IPGlobalProperties.GetIPGlobalProperties().HostName;
+            string hostname = host != null ? host : "<unknown host>";
 
             // A random string is added to the peer name to easily filter
             // our local peer by name when the server re-announces the
@@ -49,7 +50,7 @@ namespace DataChannelOrtc.Signaling
             // causes a slightly different peer name on the peer list to
             // distinguish a new peer from an old zombie peer still not
             // yet purged from the server.
-            string peerName = (hostname != null ? hostname : "<unknown host>") + "-" + _localPeerRandom + "-data";
+            string peerName = hostname + "-" + _localPeerRandom + "-data";
 
             return new Peer(-1, peerName);
         })();
@@ -184,7 +185,7 @@ namespace DataChannelOrtc.Signaling
             _dataChannel.Send(message);
         }
 
-        public async Task HandleMessageFromPeer(string message)
+        public void HandleMessageFromPeer(string message)
         {
             if (message.StartsWith("{\"candidate"))
             {

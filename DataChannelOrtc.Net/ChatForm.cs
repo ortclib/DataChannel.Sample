@@ -43,9 +43,9 @@ namespace DataChannel.Net
 
             InitializeComponent();
 
-            this.RemotePeerConnected += Signaler_RemoteConnected;
-            this.RemotePeerDisconnected += Signaler_RemoteDisconnected;
-            this.MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+            RemotePeerConnected += Signaler_RemoteConnected;
+            RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
         }
 
         private void Signaler_RemoteConnected(object sender, EventArgs e)

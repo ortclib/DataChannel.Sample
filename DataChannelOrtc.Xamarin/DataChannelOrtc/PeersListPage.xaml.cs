@@ -141,7 +141,7 @@ namespace DataChannelOrtc
                 Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / {message}");
                 return;
             }
-            await tuple.Item1.HandleMessageFromPeer(message);
+            tuple.Item1.HandleMessageFromPeer(message);
         }
 
         private void InitView()
