@@ -13,7 +13,6 @@ namespace DataChannelOrtc
     public partial class PeersListPage : ContentPage
     {
         private readonly HttpSignaler _httpSignaler;
-        public HttpSignaler HttpSignaler => _httpSignaler;
 
         Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions = 
             new Dictionary<int, Tuple<OrtcController, ChatPage>>();

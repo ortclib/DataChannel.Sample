@@ -15,10 +15,10 @@ namespace DataChannelOrtc.Signaling
     /// </summary>
     public class HttpSignaler : HttpSignalerEvents
     {
-#region SignalingServerConfig
-        private static string Url = "http://peercc-server.ortclib.org";
-        private static int Port = 8888;
-#endregion
+        #region Signaling server config
+        private static string _url = "http://peercc-server.ortclib.org";
+        private static int _port = 8888;
+        #endregion
 
         private readonly HttpClient _httpClient = new HttpClient();
         private State _state;
@@ -30,18 +30,12 @@ namespace DataChannelOrtc.Signaling
         private ConcurrentQueue<Tuple<int, string>> _sendMessageQueue = new ConcurrentQueue<Tuple<int, string>>();
         private Thread _sendThread;
 
-        /// <summary>
-        /// Creates an instance of a HttpSignaler.
-        /// </summary>
-        /// <param name="server">Host name/IP.</param>
-        /// <param name="port">Port to connect.</param>
-        /// <param name="client_name">Client name.</param>
         public HttpSignaler()
         {
             _state = State.NotConnected;
             _myId = -1;
             _clientName = OrtcController.LocalPeer.Name;
-            _baseHttpAddress = new Uri(Url + ":" + Port);
+            _baseHttpAddress = new Uri(_url + ":" + _port);
         }
 
         /// <summary>

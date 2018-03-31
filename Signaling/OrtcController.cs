@@ -11,20 +11,17 @@ using System.Diagnostics;
 
 namespace DataChannelOrtc.Signaling
 {
-#region IceServersConfig
-    static class IceServerConfig
-    {
-        public static string StunUrl = "stun.l.google.com:19302";
-        public static string TurnUrl = "turn:turn-testdrive.cloudapp.net:3478?transport=udp";
-        public static string TurnUsername = "redmond";
-        public static string TurnCredential = "redmond123";
-    }
-#endregion
-
     public class OrtcController :
         OrtcControllerEvents,
         IDisposable
     {
+        #region Ice servers config
+        private static string _stunUrl = "stun.l.google.com:19302";
+        private static string _turnUrl = "turn:turn-testdrive.cloudapp.net:3478?transport=udp";
+        private static string _turnUsername = "redmond";
+        private static string _turnCredential = "redmond123";
+        #endregion
+
         RTCIceGatherer _gatherer;
         RTCIceTransport _ice;   // Ice transport for the currently selected peer.
         RTCDtlsTransport _dtls;
@@ -281,14 +278,14 @@ namespace DataChannelOrtc.Signaling
                 {
                     new RTCIceServer
                     {
-                        Urls = new string[] { IceServerConfig.StunUrl }
+                        Urls = new string[] { _stunUrl }
                     },
                     new RTCIceServer
                     {
-                        Username = IceServerConfig.TurnUsername,
-                        Credential = IceServerConfig.TurnCredential,
+                        Username = _turnUsername,
+                        Credential = _turnCredential,
                         CredentialType = RTCIceCredentialType.Password,
-                        Urls = new string[] { IceServerConfig.TurnUrl }
+                        Urls = new string[] { _turnUrl }
                     }
                 }
             };

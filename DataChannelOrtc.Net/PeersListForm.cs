@@ -11,7 +11,6 @@ namespace DataChannel.Net
     public partial class PeersListForm : Form, IDisposable
     {
         private readonly HttpSignaler _httpSignaler;
-        public HttpSignaler HttpSignaler => _httpSignaler;
 
         Dictionary<int, Tuple<OrtcController, ChatForm>> _chatSessions = 
             new Dictionary<int, Tuple<OrtcController, ChatForm>>();
@@ -331,7 +330,7 @@ namespace DataChannel.Net
         {
             Debug.WriteLine("Connects to server.");
 
-            await HttpSignaler.Connect();
+            await _httpSignaler.Connect();
 
             btnConnect.Enabled = false;
             btnDisconnect.Enabled = true;
