@@ -92,9 +92,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Org.Ortc">
+    <Reference Include="Org.Ortc, Version=1.62.0.700, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ORTC.Xamarin.1.62.0.700-Alpha\lib\netstandard2.0\Org.Ortc.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -184,14 +183,13 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets'))" />
     <Error Condition="!Exists('..\packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets'))" />
   </Target>
-  <Import Project="packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets" Condition="Exists('packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets')" />
   <Import Project="..\packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets" Condition="Exists('..\packages\ORTC.Xamarin.1.62.0.700-Alpha\build\Ortc.Xamarin.targets')" />
 </Project>
