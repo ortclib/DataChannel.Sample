@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -38,6 +39,7 @@ namespace DataChannelOrtc.UWP
             InitializeComponent();
 
             peersListView.SelectedIndex = -1;
+            peersListView.SelectedItem = null;
 
             _httpSignaler = new HttpSignaler();
 
@@ -47,8 +49,13 @@ namespace DataChannelOrtc.UWP
             _httpSignaler.PeerDisconnected += Signaler_PeerDisconnected;
             _httpSignaler.MessageFromPeer += Signaler_MessageFromPeer;
 
+            peersListView.Tapped += PeersListView_Tapped;
+
             InitView();
         }
+
+        private void PeersListView_Tapped(object sender, TappedRoutedEventArgs e) =>
+            peersListView.SelectedItem = (Peer)((FrameworkElement)e.OriginalSource).DataContext;
 
         private async void Signaler_SignedIn(object sender, EventArgs e)
         {
@@ -57,8 +64,6 @@ namespace DataChannelOrtc.UWP
             // notifications from this thread are asynchronously
             // forwarded back to the GUI thread for further processing.
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => HandleSignedIn(sender, e));
-
-
         }
 
         private void HandleSignedIn(object sender, EventArgs e)
@@ -116,8 +121,7 @@ namespace DataChannelOrtc.UWP
 
             for (int i = 0; i < peersListView.Items.Count(); i++)
             {
-                var obj = peersListView.Items[i];
-                Peer p = (Peer)obj;
+                Peer p = (Peer)peersListView.Items[i];
                 if (p.Name == peer.Name)
                     peersListView.Items.Remove(peersListView.Items[i]);
             }
@@ -207,7 +211,6 @@ namespace DataChannelOrtc.UWP
                 {
                     Debug.WriteLine("Connects to server.");
                     await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await _httpSignaler.Connect()); 
-                    //await _httpSignaler.Connect();
 
                     //ConnectPeer.IsEnabled = false;
                     //ConnectPeer.BackgroundColor = Color.DarkGray;
@@ -231,6 +234,12 @@ namespace DataChannelOrtc.UWP
 
                 btnChat.Click += async (sender, args) =>
                 {
+                    if (peersListView.SelectedIndex == -1)
+                    {
+                        await new MessageDialog("Please select a peer.").ShowAsync();
+                        return;
+                    }
+                    
                     Peer remotePeer = peersListView.SelectedItem as Peer;
                     if (remotePeer == null) return;
 
@@ -238,9 +247,6 @@ namespace DataChannelOrtc.UWP
                     await SetupPeer(remotePeer, true);
                 };
             });
-            //TODO
-
-            
         }
 
         private async Task SetupPeer(Peer remotePeer, bool isInitiator)

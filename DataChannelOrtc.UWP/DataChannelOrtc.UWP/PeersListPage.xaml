@@ -10,6 +10,8 @@
 
     <Grid>
         <ListView x:Name="peersListView" 
+                  SelectionMode="Single"
+                  IsItemClickEnabled="True"
                   Margin="10">
             <ListView.ItemTemplate>
                 <DataTemplate>
