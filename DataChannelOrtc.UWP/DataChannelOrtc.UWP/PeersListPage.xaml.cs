@@ -35,7 +35,9 @@ namespace DataChannelOrtc.UWP
 
         public PeersListPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+
+            peersListView.SelectedIndex = -1;
 
             _httpSignaler = new HttpSignaler();
 
@@ -62,13 +64,6 @@ namespace DataChannelOrtc.UWP
         private void HandleSignedIn(object sender, EventArgs e)
         {
             Debug.WriteLine("Peer signed in to server.");
-            
-            var x = HttpSignaler._peers;
-            for (int i = 0; i < x.Count() + 1; i++)
-            {
-                peersListView.Items.Add(x);
-                Debug.WriteLine("HandleSignedIn " + x.ToString());
-            }
         }
 
         private async void Signaler_ServerConnectionFailed(object sender, EventArgs e)
@@ -93,10 +88,19 @@ namespace DataChannelOrtc.UWP
         private void HandlePeerConnected(object sender, Peer peer)
         {
             Debug.WriteLine($"Peer connected {peer.Name} / {peer.Id}");
+
+            if (peersListView.Items.Contains(peer))
+            {
+                Debug.WriteLine($"Peer already found in list: {peer.ToString()}");
+                return;
+            }
+
+            if (OrtcController.LocalPeer.Name == peer.Name)
+            {
+                Debug.WriteLine($"Peer is our local peer: {peer.ToString()}");
+                return;
+            }
             peersListView.Items.Add(peer);
-            var x = HttpSignaler._peers;
-            for (int i = 1; i < x.Count(); i++)
-                Debug.WriteLine("HandlePeerConnected " + x.ToString());
         }
 
         private async void Signaler_PeerDisconnected(object sender, Peer peer)
@@ -109,10 +113,14 @@ namespace DataChannelOrtc.UWP
         private void HandlePeerDisconnected(object sender, Peer peer)
         {
             Debug.WriteLine($"Peer disconnected {peer.Name} / {peer.Id}");
-            peersListView.Items.Remove(peer);
-            var x = HttpSignaler._peers;
-            for (int i = 0; i < x.Count(); i++)
-                Debug.WriteLine("HandlePeerDisconnected " + x);
+
+            for (int i = 0; i < peersListView.Items.Count(); i++)
+            {
+                var obj = peersListView.Items[i];
+                Peer p = (Peer)obj;
+                if (p.Name == peer.Name)
+                    peersListView.Items.Remove(peersListView.Items[i]);
+            }
         }
 
         private async void Signaler_MessageFromPeer(object sender, HttpSignalerMessageEvent @event)
@@ -180,10 +188,6 @@ namespace DataChannelOrtc.UWP
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                var x = HttpSignaler._peers;
-                for (int i = 0; i < x.Count(); i++)
-                    Debug.WriteLine("InitView " + x);
-
                 ConnectPeer.Name = " Connect ";
                 DisconnectPeer.Name = "Disconnect";
 
@@ -214,6 +218,8 @@ namespace DataChannelOrtc.UWP
                 DisconnectPeer.Click += async (sender, args) =>
                 {
                     Debug.WriteLine("Disconnects from server.");
+
+                    peersListView.Items.Clear();
 
                     await _httpSignaler.SignOut();
 
