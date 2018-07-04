@@ -13,29 +13,27 @@
                       Margin="10">
             <ListView.ItemTemplate>
                 <DataTemplate>
+                    <ListViewItem>
                         <Grid Padding="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="100" />
                                 <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="200" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding AuthorName}"
+                                        Grid.Row="0"
+                                        Grid.Column="0" />
+                            <TextBlock Text="{Binding TimeStr}"
                                        Grid.Row="0"
-                                       Grid.Column="0" 
-                                       FontSize="Small"/>
-                            <TextBlock Text="{Binding Time}"
-                                       Grid.Row="0"
-                                       Grid.Column="1"
-                                       FontSize="Small" />
-                            <TextBlock Text="{Binding Text}"
-                                       Grid.Row="1"
-                                       Grid.Column="0" 
-                                       Grid.ColumnSpan="2"
-                                       FontSize="Medium" />
+                                       Grid.Column="1"/>
+                            <TextBlock Text="{Binding MessageText}"
+                                        Grid.Row="0"
+                                        Grid.Column="2" />
                         </Grid>
+                    </ListViewItem>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
@@ -44,6 +42,7 @@
                        Placeholder="Message"
                        TextColor="Black"
                        HorizontalOptions="FillAndExpand" />-->
-            <Button x:Name="btnSend" />
+            <Button x:Name="btnSend" 
+                    Content=" Send "/>
     </Grid>
 </Page>

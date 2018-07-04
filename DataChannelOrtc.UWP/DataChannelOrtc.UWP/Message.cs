@@ -9,27 +9,62 @@ namespace DataChannelOrtc.UWP
         public Peer Recipient { get; set; }
         public Peer SendingPeer { get; set; }
 
-        public DateTime DateTime { get; set; }
-
-        public string Time { get; set; }
-        public string Text { get; set; }
+        public DateTime Time { get; set; }
+        public string MessageText { get; set; }
         public string AuthorName { get; set; }
+        public string TimeStr { get; set; }
 
         public Message() { }
 
-        public Message(DateTime date, Peer author, string text)
-        {
-            Time = date.ToString("h:mm");
-            AuthorName = author.Name;
-            Text = text;
-        }
-
         public Message(Peer author, Peer recipient, DateTime date, string text)
         {
-            Author = author;
-            Recipient = recipient;
-            DateTime = date;
-            Text = text;
+            AuthorName = author.Name;
+            //Recipient = recipient;
+            Time = date;
+            TimeStr = date.ToString("h:mm");
+            MessageText = text;
         }
+
+        public override string ToString()
+        {
+            return "[" + AuthorName + "] " + TimeStr + ":  " + MessageText;
+        }
+
+        //public Peer Author { get; set; }
+        //public Peer Recipient { get; set; }
+        //public Peer SendingPeer { get; set; }
+
+        //public DateTime DateTime { get; set; }
+
+        //public string Time { get; set; }
+        //public string Text { get; set; }
+        //public string AuthorName { get; set; }
+
+        //public Message() { }
+
+        //public Message(string text)
+        //{
+        //    Text = text;
+        //}
+
+        //public Message(DateTime date, Peer author, string text)
+        //{
+        //    Time = date.ToString("h:mm");
+        //    AuthorName = author.Name;
+        //    Text = text;
+        //}
+
+        //public Message(Peer author, Peer recipient, DateTime date, string text)
+        //{
+        //    Author = author;
+        //    Recipient = recipient;
+        //    DateTime = date;
+        //    Text = text;
+        //}
+
+        //public override string ToString()
+        //{
+        //    return "[" + Author.Name + "] " + Time + ":  " + Text;
+        //}
     }
 }

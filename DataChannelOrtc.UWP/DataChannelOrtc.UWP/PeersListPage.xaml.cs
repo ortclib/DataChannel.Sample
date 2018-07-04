@@ -12,6 +12,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -37,6 +38,10 @@ namespace DataChannelOrtc.UWP
         public PeersListPage()
         {
             InitializeComponent();
+
+            ApplicationView.PreferredLaunchViewSize = new Size(500, 400);
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+            //ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 450));
 
             peersListView.SelectedIndex = -1;
             peersListView.SelectedItem = null;
@@ -333,12 +338,12 @@ namespace DataChannelOrtc.UWP
 
         private void ChatPage_SendMessageToRemotePeer(object sender, Message message)
         {
-            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: {message.Text}");
+            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: {message.MessageText}");
 
             Tuple<OrtcController, ChatPage> tuple;
             if (_chatSessions.TryGetValue(message.Recipient.Id, out tuple))
             {
-                tuple.Item1.HandleSendMessageViaDataChannel(message.Text);
+                tuple.Item1.HandleSendMessageViaDataChannel(message.MessageText);
             }
         }
     }

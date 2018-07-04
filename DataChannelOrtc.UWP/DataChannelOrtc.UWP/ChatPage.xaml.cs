@@ -24,7 +24,7 @@ namespace DataChannelOrtc.UWP
     /// </summary>
     public sealed partial class ChatPage : Page
     {
-        public ObservableCollection<Message> _messages = new ObservableCollection<Message>();
+        //public ObservableCollection<Message> _messages = new ObservableCollection<Message>();
 
         public event EventHandler RemotePeerConnected;
         public event EventHandler RemotePeerDisconnected;
@@ -64,6 +64,8 @@ namespace DataChannelOrtc.UWP
 
             LocalPeer = parameters.LocalPeer;
             RemotePeer = parameters.RemotePeer;
+
+            
         }
 
         public ChatPage()
@@ -74,18 +76,20 @@ namespace DataChannelOrtc.UWP
             RemotePeerDisconnected += Signaler_RemoteDisconnected;
             MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
 
+            
+
             InitView();
         }
 
         public ChatPage(Peer localPeer, Peer remotePeer)
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
 
-            RemotePeerConnected += Signaler_RemoteConnected;
-            RemotePeerDisconnected += Signaler_RemoteDisconnected;
-            MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+            //RemotePeerConnected += Signaler_RemoteConnected;
+            //RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            //MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
 
-            InitView();
+            //InitView();
         }
 
         private void Signaler_RemoteConnected(object sender, EventArgs e)
@@ -104,14 +108,23 @@ namespace DataChannelOrtc.UWP
 
         private void Signaler_MessageFromRemotePeer(object sender, Message message)
         {
-            _messages.Add(new Message(DateTime.Now, RemotePeer, message.Text));
 
-            ScrollMessages();
         }
 
         private void InitView()
         {
-            //TODO
+
+            btnSend.Click += (sender, args) =>
+            {
+                Message m = new Message(LocalPeer, RemotePeer, DateTime.Now, "text message");
+
+                listMessages.Items.Add(m);
+            };
+
+
+
+
+
         }
 
         private void OnSendMessageToRemotePeer(Message message)
