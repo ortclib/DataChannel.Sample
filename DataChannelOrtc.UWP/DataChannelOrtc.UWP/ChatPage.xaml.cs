@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -41,9 +42,13 @@ namespace DataChannelOrtc.UWP
             RemotePeerDisconnected?.Invoke(this, null);
         }
 
-        public void HandleMessageFromPeer(string message)
+        public void HandleMessageFromPeer(Peer remotePeer, string message)
         {
-            MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, LocalPeer, DateTime.Now, message));
+            Debug.WriteLine("HandleMessageFromPeer!");
+            //MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, LocalPeer, DateTime.Now, message));
+            MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, DateTime.Now, message));
+            PeersListPage._messages.Add(new Message(remotePeer, DateTime.Now, message));
+            //listMessages.Items.Add(new Message(RemotePeer, DateTime.Now, message));
         }
 
         private bool _isSendReady = false;
@@ -72,13 +77,15 @@ namespace DataChannelOrtc.UWP
         {
             this.InitializeComponent();
 
+            InitView();
+
             RemotePeerConnected += Signaler_RemoteConnected;
             RemotePeerDisconnected += Signaler_RemoteDisconnected;
             MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
 
             
 
-            InitView();
+            
         }
 
         public ChatPage(Peer localPeer, Peer remotePeer)
@@ -108,17 +115,22 @@ namespace DataChannelOrtc.UWP
 
         private void Signaler_MessageFromRemotePeer(object sender, Message message)
         {
-
+            listMessages.Items.Add(new Message(LocalPeer, DateTime.Now, message.MessageText));
         }
 
         private void InitView()
         {
+            listMessages.ItemsSource = PeersListPage._messages;
+            listMessages.VerticalAlignment = VerticalAlignment.Center;
+            listMessages.HorizontalAlignment = HorizontalAlignment.Center;
+
+            btnSend.VerticalAlignment = VerticalAlignment.Bottom;
+            btnSend.HorizontalAlignment = HorizontalAlignment.Right;
 
             btnSend.Click += (sender, args) =>
             {
-                Message m = new Message(LocalPeer, RemotePeer, DateTime.Now, "text message");
-
-                listMessages.Items.Add(m);
+                PeersListPage._messages.Add(new Message(LocalPeer, DateTime.Now, "text message"));
+                //listMessages.Items.Add(new Message(LocalPeer, DateTime.Now, "text message"));
             };
 
 

@@ -35,6 +35,8 @@ namespace DataChannelOrtc.UWP
         Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions =
             new Dictionary<int, Tuple<OrtcController, ChatPage>>();
 
+        public static ObservableCollection<Message> _messages = new ObservableCollection<Message>();
+
         public PeersListPage()
         {
             InitializeComponent();
@@ -276,7 +278,24 @@ namespace DataChannelOrtc.UWP
             parameters.LocalPeer = OrtcController.LocalPeer;
             parameters.RemotePeer = remotePeer;
 
-            Frame.Navigate(typeof(ChatPage), parameters);
+
+
+            //Frame.Navigate(typeof(ChatPage), parameters);
+            //var viewId = 0;
+            await tuple.Item2.Dispatcher.RunAsync(
+                CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    var frame = new Frame();
+                    frame.Navigate(typeof(ChatPage), parameters);
+                    Window.Current.Content = frame;
+
+                    //viewId = ApplicationView.GetForCurrentView().Id;
+
+                    Window.Current.Activate();
+                });
+
+            //await ApplicationViewSwitcher.TryShowAsStandaloneAsync(viewId);
 
             // Create a new tuple and carry forward the chat page from the previous tuple
             tuple = new Tuple<OrtcController, ChatPage>(new OrtcController(remotePeer, isInitiator), tuple.Item2);
@@ -290,7 +309,7 @@ namespace DataChannelOrtc.UWP
             await tuple.Item1.SetupAsync();
         }
 
-        private void OrtcSignaler_OnDataChannelMessage(object sender, string message)
+        private async void OrtcSignaler_OnDataChannelMessage(object sender, string message)
         {
             OrtcController signaler = (OrtcController)sender;
             Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: {message}");
@@ -300,7 +319,7 @@ namespace DataChannelOrtc.UWP
             Tuple<OrtcController, ChatPage> tuple;
             if (_chatSessions.TryGetValue(signaler.RemotePeer.Id, out tuple))
             {
-                tuple.Item2.HandleMessageFromPeer(message);
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => tuple.Item2.HandleMessageFromPeer(signaler.RemotePeer, message));
             }
         }
 

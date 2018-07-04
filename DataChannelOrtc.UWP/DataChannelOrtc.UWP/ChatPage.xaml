@@ -17,11 +17,11 @@
                         <Grid Padding="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="380" />
                                 <ColumnDefinition Width="40" />
-                                <ColumnDefinition Width="200" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding AuthorName}"
                                         Grid.Row="0"
@@ -30,8 +30,8 @@
                                        Grid.Row="0"
                                        Grid.Column="1"/>
                             <TextBlock Text="{Binding MessageText}"
-                                        Grid.Row="0"
-                                        Grid.Column="2" />
+                                        Grid.Row="1"
+                                        Grid.Column="0" />
                         </Grid>
                     </ListViewItem>
                 </DataTemplate>
