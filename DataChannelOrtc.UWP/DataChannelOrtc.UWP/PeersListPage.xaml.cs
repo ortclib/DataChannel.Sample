@@ -267,8 +267,11 @@ namespace DataChannelOrtc.UWP
                 tuple.Item2.SendMessageToRemotePeer += ChatPage_SendMessageToRemotePeer;
             }
 
-            //TODO
-            //Device.BeginInvokeOnMainThread(async () => await Navigation.PushAsync(tuple.Item2));
+            ChatPageParams parameters = new ChatPageParams();
+            parameters.LocalPeer = OrtcController.LocalPeer;
+            parameters.RemotePeer = remotePeer;
+
+            Frame.Navigate(typeof(ChatPage), parameters);
 
             // Create a new tuple and carry forward the chat page from the previous tuple
             tuple = new Tuple<OrtcController, ChatPage>(new OrtcController(remotePeer, isInitiator), tuple.Item2);
@@ -338,5 +341,11 @@ namespace DataChannelOrtc.UWP
                 tuple.Item1.HandleSendMessageViaDataChannel(message.Text);
             }
         }
+    }
+
+    public class ChatPageParams
+    {
+        public Peer LocalPeer { get; set; }
+        public Peer RemotePeer { get; set; }
     }
 }

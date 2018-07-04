@@ -9,6 +9,41 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <ListView x:Name="listMessages"
+                      Margin="10">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                        <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding AuthorName}"
+                                       Grid.Row="0"
+                                       Grid.Column="0" 
+                                       FontSize="Small"/>
+                            <TextBlock Text="{Binding Time}"
+                                       Grid.Row="0"
+                                       Grid.Column="1"
+                                       FontSize="Small" />
+                            <TextBlock Text="{Binding Text}"
+                                       Grid.Row="1"
+                                       Grid.Column="0" 
+                                       Grid.ColumnSpan="2"
+                                       FontSize="Medium" />
+                        </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
 
+            <!--<Entry x:Name="entryMessage"
+                       Placeholder="Message"
+                       TextColor="Black"
+                       HorizontalOptions="FillAndExpand" />-->
+            <Button x:Name="btnSend" />
     </Grid>
 </Page>

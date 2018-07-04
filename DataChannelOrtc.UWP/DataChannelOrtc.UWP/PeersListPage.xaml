@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Margin="40">
         <ListView x:Name="peersListView" 
                   SelectionMode="Single"
                   IsItemClickEnabled="True"
@@ -41,7 +41,6 @@
                 Content="Disconnect"/>
         <Button x:Name="btnChat" 
                 Content="Chat"
-
-                    Margin="10,0,10,0"/>
+                Margin="10,0,10,0"/>
     </Grid>
 </Page>

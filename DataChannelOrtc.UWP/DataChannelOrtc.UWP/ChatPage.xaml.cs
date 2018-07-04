@@ -56,11 +56,29 @@ namespace DataChannelOrtc.UWP
         public Peer LocalPeer { get; set; }
         public Peer RemotePeer { get; set; }
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            ChatPageParams parameters = (ChatPageParams)e.Parameter;
+
+            LocalPeer = parameters.LocalPeer;
+            RemotePeer = parameters.RemotePeer;
+        }
+
+        public ChatPage()
+        {
+            this.InitializeComponent();
+
+            RemotePeerConnected += Signaler_RemoteConnected;
+            RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+
+            InitView();
+        }
+
         public ChatPage(Peer localPeer, Peer remotePeer)
         {
-            LocalPeer = localPeer;
-            RemotePeer = remotePeer;
-
             this.InitializeComponent();
 
             RemotePeerConnected += Signaler_RemoteConnected;
