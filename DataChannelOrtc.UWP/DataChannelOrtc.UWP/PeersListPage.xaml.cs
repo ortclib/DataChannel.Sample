@@ -53,7 +53,7 @@ namespace DataChannelOrtc.UWP
 
         public void HandleMessageFromPeer(Peer remotePeer, string message)
         {
-            MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, DateTime.Now, message));
+            MessageFromRemotePeer?.Invoke(this, new Message(remotePeer, DateTime.Now, message));
         }
 
         private bool _isSendReady = false;
@@ -67,7 +67,7 @@ namespace DataChannelOrtc.UWP
         {
             InitializeComponent();
 
-            ApplicationView.PreferredLaunchViewSize = new Size(900, 560);
+            ApplicationView.PreferredLaunchViewSize = new Size(900, 550);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
             string name = OrtcController.LocalPeer.Name;
@@ -255,23 +255,8 @@ namespace DataChannelOrtc.UWP
         {
             listMessages.ItemsSource = _messages;
 
-            //ConnectPeer.Name = " Connect ";
-            //DisconnectPeer.Name = "Disconnect";
-
-            //ConnectPeer.VerticalAlignment = VerticalAlignment.Top;
-            //ConnectPeer.HorizontalAlignment = HorizontalAlignment.Left;
-
-            //DisconnectPeer.VerticalAlignment = VerticalAlignment.Top;
-            //DisconnectPeer.HorizontalAlignment = HorizontalAlignment.Right;
-
-            //peersListView.VerticalAlignment = VerticalAlignment.Top;
-            //peersListView.HorizontalAlignment = HorizontalAlignment.Center;
-
-            //listMessages.VerticalAlignment = VerticalAlignment.Bottom;
-            //listMessages.HorizontalAlignment = HorizontalAlignment.Center;
-
-            //btnChat.VerticalAlignment = VerticalAlignment.Center;
-            //btnChat.HorizontalAlignment = HorizontalAlignment.Right;
+            IsSendReady = false;
+            btnSend.IsEnabled = false;
 
             ConnectPeer.Click += async (sender, args) =>
             {
@@ -320,11 +305,16 @@ namespace DataChannelOrtc.UWP
                     Debug.WriteLine("Please wait, connecting...");
                     return;
                 }
-                Message message = new Message(OrtcController.LocalPeer, DateTime.Now, txtMessage.Text);
-                
-                _messages.Add(message);
+                else
+                {
+                    Message message = new Message(OrtcController.LocalPeer, DateTime.Now, txtMessage.Text);
 
-                OnSendMessageToRemotePeer(message);
+                    _messages.Add(message);
+
+                    txtMessage.Text = string.Empty;
+
+                    OnSendMessageToRemotePeer(message);
+                }
             };
 
         }

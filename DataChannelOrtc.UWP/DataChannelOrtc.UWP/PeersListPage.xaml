@@ -6,9 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    
     Background="LightGray">
-    <!--Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"-->
+    
     <Grid Margin="10"
           Padding="10"
           ColumnSpacing="50">
@@ -41,12 +40,11 @@
                       VerticalAlignment="Top"
                       Margin="10"
                       SelectionMode="Single"
-                      IsItemClickEnabled="True"
-                      Padding="10">
+                      IsItemClickEnabled="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ListViewItem Background="White">
-                            <Grid Padding="10">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
@@ -79,29 +77,31 @@
             <ListView x:Name="listMessages"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Bottom"
-                      Margin="10"
-                      Padding="10">
+                      Margin="10">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ListViewItem Background="White">
-                            <Grid Padding="10">
+                            <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="380" />
+                                    <ColumnDefinition Width="220" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="{Binding AuthorName}"
-                                            Grid.Row="0"
-                                            Grid.Column="0" />
+                                           Grid.Row="0"
+                                           Grid.Column="0" 
+                                           TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding TimeStr}"
-                                            Grid.Row="0"
-                                            Grid.Column="1"/>
+                                           Grid.Row="0"
+                                           Grid.Column="1"
+                                           TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding MessageText}"
-                                            Grid.Row="1"
-                                            Grid.Column="0" />
+                                           Grid.Row="1"
+                                           Grid.Column="0" 
+                                           TextWrapping="Wrap"/>
                             </Grid>
                         </ListViewItem>
                     </DataTemplate>
