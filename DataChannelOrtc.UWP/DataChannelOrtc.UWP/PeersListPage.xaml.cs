@@ -53,10 +53,7 @@ namespace DataChannelOrtc.UWP
 
         public void HandleMessageFromPeer(Peer remotePeer, string message)
         {
-            Debug.WriteLine("HandleMessageFromPeer!");
-
             MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, DateTime.Now, message));
-            _messages.Add(new Message(remotePeer, DateTime.Now, message));
         }
 
         private bool _isSendReady = false;
@@ -70,7 +67,7 @@ namespace DataChannelOrtc.UWP
         {
             InitializeComponent();
 
-            ApplicationView.PreferredLaunchViewSize = new Size(500, 800);
+            ApplicationView.PreferredLaunchViewSize = new Size(900, 560);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
             string name = OrtcController.LocalPeer.Name;
@@ -258,23 +255,23 @@ namespace DataChannelOrtc.UWP
         {
             listMessages.ItemsSource = _messages;
 
-            ConnectPeer.Name = " Connect ";
-            DisconnectPeer.Name = "Disconnect";
+            //ConnectPeer.Name = " Connect ";
+            //DisconnectPeer.Name = "Disconnect";
 
-            ConnectPeer.VerticalAlignment = VerticalAlignment.Top;
-            ConnectPeer.HorizontalAlignment = HorizontalAlignment.Left;
+            //ConnectPeer.VerticalAlignment = VerticalAlignment.Top;
+            //ConnectPeer.HorizontalAlignment = HorizontalAlignment.Left;
 
-            DisconnectPeer.VerticalAlignment = VerticalAlignment.Top;
-            DisconnectPeer.HorizontalAlignment = HorizontalAlignment.Right;
+            //DisconnectPeer.VerticalAlignment = VerticalAlignment.Top;
+            //DisconnectPeer.HorizontalAlignment = HorizontalAlignment.Right;
 
-            peersListView.VerticalAlignment = VerticalAlignment.Top;
-            peersListView.HorizontalAlignment = HorizontalAlignment.Center;
+            //peersListView.VerticalAlignment = VerticalAlignment.Top;
+            //peersListView.HorizontalAlignment = HorizontalAlignment.Center;
 
-            listMessages.VerticalAlignment = VerticalAlignment.Bottom;
-            listMessages.HorizontalAlignment = HorizontalAlignment.Center;
+            //listMessages.VerticalAlignment = VerticalAlignment.Bottom;
+            //listMessages.HorizontalAlignment = HorizontalAlignment.Center;
 
-            btnChat.VerticalAlignment = VerticalAlignment.Center;
-            btnChat.HorizontalAlignment = HorizontalAlignment.Right;
+            //btnChat.VerticalAlignment = VerticalAlignment.Center;
+            //btnChat.HorizontalAlignment = HorizontalAlignment.Right;
 
             ConnectPeer.Click += async (sender, args) =>
             {
@@ -323,9 +320,8 @@ namespace DataChannelOrtc.UWP
                     Debug.WriteLine("Please wait, connecting...");
                     return;
                 }
-
-                Message message = new Message(OrtcController.LocalPeer, DateTime.Now, "text message");
-
+                Message message = new Message(OrtcController.LocalPeer, DateTime.Now, txtMessage.Text);
+                
                 _messages.Add(message);
 
                 OnSendMessageToRemotePeer(message);

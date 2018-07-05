@@ -6,71 +6,123 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    <Grid Margin="40">
-        <ListView x:Name="peersListView" 
-                  SelectionMode="Single"
-                  IsItemClickEnabled="True"
-                  Margin="10">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ListViewItem>
-                        <Grid Padding="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="35" />
-                                <ColumnDefinition Width="195" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Id}"
+    
+    Background="LightGray">
+    <!--Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"-->
+    <Grid Margin="10"
+          Padding="10"
+          ColumnSpacing="50">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="420" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="400" />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="ConnectPeer" 
+                Content=" Connect "
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Grid.Row="0"
+                Grid.Column="0"/>
+        <Button x:Name="DisconnectPeer" 
+                Content="Disconnect"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Grid.Row="0"
+                Grid.Column="0"/>
+        <StackPanel Background="White"
+                    Grid.Row="1"
+                    Grid.Column="0">
+            <ListView x:Name="peersListView" 
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Top"
+                      Margin="10"
+                      SelectionMode="Single"
+                      IsItemClickEnabled="True"
+                      Padding="10">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ListViewItem Background="White">
+                            <Grid Padding="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="35" />
+                                    <ColumnDefinition Width="195" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Id}"
                                         Grid.Row="0"
                                         Grid.Column="0" />
-                            <TextBlock Text="{Binding Name}"
+                                <TextBlock Text="{Binding Name}"
                                         Grid.Row="0"
                                         Grid.Column="1" />
-                        </Grid>
-                    </ListViewItem>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Button x:Name="ConnectPeer" 
-                Content=" Connect "/>
-        <Button x:Name="DisconnectPeer" 
-                Content="Disconnect"/>
+                            </Grid>
+                        </ListViewItem>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
         <Button x:Name="btnChat" 
                 Content="Chat"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Grid.Row="2"
+                Grid.Column="0"
                 Margin="10,0,10,0"/>
-        <ListView x:Name="listMessages"
-                      Margin="10">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ListViewItem>
-                        <Grid Padding="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="380" />
-                                <ColumnDefinition Width="40" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding AuthorName}"
-                                        Grid.Row="0"
-                                        Grid.Column="0" />
-                            <TextBlock Text="{Binding TimeStr}"
-                                       Grid.Row="0"
-                                       Grid.Column="1"/>
-                            <TextBlock Text="{Binding MessageText}"
-                                        Grid.Row="1"
-                                        Grid.Column="0" />
-                        </Grid>
-                    </ListViewItem>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <StackPanel Background="White"
+                    Grid.Row="1"
+                    Grid.Column="1">
+            <ListView x:Name="listMessages"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      Margin="10"
+                      Padding="10">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ListViewItem Background="White">
+                            <Grid Padding="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="380" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding AuthorName}"
+                                            Grid.Row="0"
+                                            Grid.Column="0" />
+                                <TextBlock Text="{Binding TimeStr}"
+                                            Grid.Row="0"
+                                            Grid.Column="1"/>
+                                <TextBlock Text="{Binding MessageText}"
+                                            Grid.Row="1"
+                                            Grid.Column="0" />
+                            </Grid>
+                        </ListViewItem>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
+        <TextBox x:Name="txtMessage"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center"
+                 Margin="10,0,10,0"
+                 Grid.Row="2"
+                 Grid.Column="1"
+                 PlaceholderText="Message"
+                 Height="20"
+                 Width="300"/>
         <Button x:Name="btnSend" 
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="10,0,10,0"
+                Grid.Row="2"
+                Grid.Column="1"
                 Content=" Send "/>
     </Grid>
 </Page>
