@@ -42,5 +42,35 @@
         <Button x:Name="btnChat" 
                 Content="Chat"
                 Margin="10,0,10,0"/>
+        <ListView x:Name="listMessages"
+                      Margin="10">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ListViewItem>
+                        <Grid Padding="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="380" />
+                                <ColumnDefinition Width="40" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding AuthorName}"
+                                        Grid.Row="0"
+                                        Grid.Column="0" />
+                            <TextBlock Text="{Binding TimeStr}"
+                                       Grid.Row="0"
+                                       Grid.Column="1"/>
+                            <TextBlock Text="{Binding MessageText}"
+                                        Grid.Row="1"
+                                        Grid.Column="0" />
+                        </Grid>
+                    </ListViewItem>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button x:Name="btnSend" 
+                Content=" Send "/>
     </Grid>
 </Page>

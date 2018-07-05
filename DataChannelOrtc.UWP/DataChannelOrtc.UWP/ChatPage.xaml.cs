@@ -65,10 +65,10 @@ namespace DataChannelOrtc.UWP
         {
             base.OnNavigatedTo(e);
 
-            ChatPageParams parameters = (ChatPageParams)e.Parameter;
+            //ChatPageParams parameters = (ChatPageParams)e.Parameter;
 
-            LocalPeer = parameters.LocalPeer;
-            RemotePeer = parameters.RemotePeer;
+            //LocalPeer = parameters.LocalPeer;
+            //RemotePeer = parameters.RemotePeer;
 
             
         }
@@ -129,13 +129,12 @@ namespace DataChannelOrtc.UWP
 
             btnSend.Click += (sender, args) =>
             {
-                PeersListPage._messages.Add(new Message(LocalPeer, DateTime.Now, "text message"));
-                //listMessages.Items.Add(new Message(LocalPeer, DateTime.Now, "text message"));
+                Message message = new Message(OrtcController.LocalPeer, DateTime.Now, "text message");
+
+                PeersListPage._messages.Add(message);
+
+                OnSendMessageToRemotePeer(message);
             };
-
-
-
-
 
         }
 

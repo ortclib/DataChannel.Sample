@@ -27,7 +27,8 @@ namespace DataChannelOrtc.UWP
 
         public Message(Peer author, DateTime time, string text)
         {
-            AuthorName = author.Name;
+            //AuthorName = author.Name;
+            AuthorName = "user1";
             TimeStr = time.ToString("h:mm");
             MessageText = text;
         }

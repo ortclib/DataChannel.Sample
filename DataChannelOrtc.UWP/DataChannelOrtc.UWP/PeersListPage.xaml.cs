@@ -31,19 +31,50 @@ namespace DataChannelOrtc.UWP
     public sealed partial class PeersListPage : Page
     {
         private readonly HttpSignaler _httpSignaler;
+        private OrtcController _ortcController;
 
-        Dictionary<int, Tuple<OrtcController, ChatPage>> _chatSessions =
-            new Dictionary<int, Tuple<OrtcController, ChatPage>>();
-
+        public Peer RemotePeer { get; set; }
         public static ObservableCollection<Message> _messages = new ObservableCollection<Message>();
+
+        public event EventHandler RemotePeerConnected;
+        public event EventHandler RemotePeerDisconnected;
+        public event EventHandler<Message> SendMessageToRemotePeer;
+        private event EventHandler<Message> MessageFromRemotePeer;
+
+        public void HandleRemotePeerConnected()
+        {
+            RemotePeerConnected?.Invoke(this, null);
+        }
+
+        public void HandleRemotePeerDisconnected()
+        {
+            RemotePeerDisconnected?.Invoke(this, null);
+        }
+
+        public void HandleMessageFromPeer(Peer remotePeer, string message)
+        {
+            Debug.WriteLine("HandleMessageFromPeer!");
+
+            MessageFromRemotePeer?.Invoke(this, new Message(RemotePeer, DateTime.Now, message));
+            _messages.Add(new Message(remotePeer, DateTime.Now, message));
+        }
+
+        private bool _isSendReady = false;
+        public bool IsSendReady
+        {
+            get { return _isSendReady; }
+            set { _isSendReady = value; }
+        }
 
         public PeersListPage()
         {
             InitializeComponent();
 
-            ApplicationView.PreferredLaunchViewSize = new Size(500, 400);
+            ApplicationView.PreferredLaunchViewSize = new Size(500, 800);
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
-            //ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(300, 450));
+
+            string name = OrtcController.LocalPeer.Name;
+            Debug.WriteLine($"Connecting to server from local peer: {name}");
 
             peersListView.SelectedIndex = -1;
             peersListView.SelectedItem = null;
@@ -56,9 +87,30 @@ namespace DataChannelOrtc.UWP
             _httpSignaler.PeerDisconnected += Signaler_PeerDisconnected;
             _httpSignaler.MessageFromPeer += Signaler_MessageFromPeer;
 
+            RemotePeerConnected += Signaler_RemoteConnected;
+            RemotePeerDisconnected += Signaler_RemoteDisconnected;
+            MessageFromRemotePeer += Signaler_MessageFromRemotePeer;
+
             peersListView.Tapped += PeersListView_Tapped;
 
             InitView();
+        }
+
+        private void Signaler_RemoteConnected(object sender, EventArgs e)
+        {
+            IsSendReady = true;
+            btnSend.IsEnabled = true;
+        }
+
+        private void Signaler_RemoteDisconnected(object sender, EventArgs e)
+        {
+            IsSendReady = false;
+            btnSend.IsEnabled = false;
+        }
+
+        private void Signaler_MessageFromRemotePeer(object sender, Message message)
+        {
+            _messages.Add(message);
         }
 
         private void PeersListView_Tapped(object sender, TappedRoutedEventArgs e) =>
@@ -94,7 +146,6 @@ namespace DataChannelOrtc.UWP
         {
             // See method Signaler_SignedIn for concurrency comments.
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => HandlePeerConnected(sender, peer));
-
         }
 
         private void HandlePeerConnected(object sender, Peer peer)
@@ -145,7 +196,7 @@ namespace DataChannelOrtc.UWP
             // events must be processed exactly one at a time and the next
             // message from the server should be held back until the current
             // message is fully processed.
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => 
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 // Do not invoke a .Wait() on the task result of
                 // HandleMessageFromPeer! While this might seem as a
@@ -172,7 +223,22 @@ namespace DataChannelOrtc.UWP
                     complete.Set();
                 });
             });
-
+            // By waiting on the async result the signaler's task is blocked
+            // from processing the next signaler message until the current
+            // message is fully processed. The signaler thread is allowed to
+            // be blocked because events are never fired on the signaler's
+            // tasks dispatchers.
+            //
+            // While .BeginInvoke() does ensure that each message is processed
+            // by the GUI thread in the order the message is sent to the GUI
+            // thread, it does not ensure the message is entirely processed
+            // before the next message directed to the GUI thread is processed.
+            // The moment an async/awaitable task happens on the GUI thread
+            // the next message in the GUI queue is allowed to be processed.
+            // Tasks and related methods cause the GUI thread to become
+            // re-entrant to processing more messages whenever an async
+            // related routine is called.
+            complete.WaitOne();
         }
 
         private async Task HandleMessageFromPeer(object sender, HttpSignalerMessageEvent @event)
@@ -185,191 +251,146 @@ namespace DataChannelOrtc.UWP
                 Debug.WriteLine("contains OpenDataChannel");
                 await SetupPeer(peer, false);
             }
-
-            Tuple<OrtcController, ChatPage> tuple;
-            if (!_chatSessions.TryGetValue(peer.Id, out tuple))
-            {
-                Debug.WriteLine($"[WARNING] No peer found to direct remote message: {peer.Id} / {message}");
-                return;
-            }
-            tuple.Item1.HandleMessageFromPeer(message);
+            _ortcController.HandleMessageFromPeer(message);
         }
 
-        private async void InitView()
+        private void InitView()
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            listMessages.ItemsSource = _messages;
+
+            ConnectPeer.Name = " Connect ";
+            DisconnectPeer.Name = "Disconnect";
+
+            ConnectPeer.VerticalAlignment = VerticalAlignment.Top;
+            ConnectPeer.HorizontalAlignment = HorizontalAlignment.Left;
+
+            DisconnectPeer.VerticalAlignment = VerticalAlignment.Top;
+            DisconnectPeer.HorizontalAlignment = HorizontalAlignment.Right;
+
+            peersListView.VerticalAlignment = VerticalAlignment.Top;
+            peersListView.HorizontalAlignment = HorizontalAlignment.Center;
+
+            listMessages.VerticalAlignment = VerticalAlignment.Bottom;
+            listMessages.HorizontalAlignment = HorizontalAlignment.Center;
+
+            btnChat.VerticalAlignment = VerticalAlignment.Center;
+            btnChat.HorizontalAlignment = HorizontalAlignment.Right;
+
+            ConnectPeer.Click += async (sender, args) =>
             {
-                ConnectPeer.Name = " Connect ";
-                DisconnectPeer.Name = "Disconnect";
+                Debug.WriteLine("Connects to server.");
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await _httpSignaler.Connect());
 
-                ConnectPeer.VerticalAlignment = VerticalAlignment.Top;
-                ConnectPeer.HorizontalAlignment = HorizontalAlignment.Left;
+                ConnectPeer.IsEnabled = false;
+                //ConnectPeer.BackgroundColor = Color.DarkGray;
+                DisconnectPeer.IsEnabled = true;
+                //DisconnectPeer.BackgroundColor = Color.Gray;
+            };
 
-                DisconnectPeer.VerticalAlignment = VerticalAlignment.Top;
-                DisconnectPeer.HorizontalAlignment = HorizontalAlignment.Right;
+            DisconnectPeer.Click += async (sender, args) =>
+            {
+                Debug.WriteLine("Disconnects from server.");
 
-                peersListView.VerticalAlignment = VerticalAlignment.Center;
-                peersListView.HorizontalAlignment = HorizontalAlignment.Center;
+                peersListView.Items.Clear();
 
-                btnChat.VerticalAlignment = VerticalAlignment.Bottom;
-                btnChat.HorizontalAlignment = HorizontalAlignment.Center;
+                await _httpSignaler.SignOut();
 
-                ConnectPeer.Click += async (sender, args) =>
+                DisconnectPeer.IsEnabled = false;
+                //DisconnectPeer.BackgroundColor = Color.DarkGray;
+                ConnectPeer.IsEnabled = true;
+                //ConnectPeer.BackgroundColor = Color.Gray;
+            };
+
+            btnChat.Click += async (sender, args) =>
+            {
+                if (peersListView.SelectedIndex == -1)
                 {
-                    Debug.WriteLine("Connects to server.");
-                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () => await _httpSignaler.Connect()); 
+                    await new MessageDialog("Please select a peer.").ShowAsync();
+                    return;
+                }
 
-                    //ConnectPeer.IsEnabled = false;
-                    //ConnectPeer.BackgroundColor = Color.DarkGray;
-                    //DisconnectPeer.IsEnabled = true;
-                    //DisconnectPeer.BackgroundColor = Color.Gray;
-                };
+                Peer remotePeer = peersListView.SelectedItem as Peer;
+                if (remotePeer == null) return;
 
-                DisconnectPeer.Click += async (sender, args) =>
+                _httpSignaler.SendToPeer(remotePeer.Id, "OpenDataChannel");
+                await SetupPeer(remotePeer, true);
+            };
+
+            btnSend.Click += (sender, args) =>
+            {
+                if (!IsSendReady)
                 {
-                    Debug.WriteLine("Disconnects from server.");
+                    Debug.WriteLine("Please wait, connecting...");
+                    return;
+                }
 
-                    peersListView.Items.Clear();
+                Message message = new Message(OrtcController.LocalPeer, DateTime.Now, "text message");
 
-                    await _httpSignaler.SignOut();
+                _messages.Add(message);
 
-                    //DisconnectPeer.IsEnabled = false;
-                    //DisconnectPeer.BackgroundColor = Color.DarkGray;
-                    //ConnectPeer.IsEnabled = true;
-                    //ConnectPeer.BackgroundColor = Color.Gray;
-                };
+                OnSendMessageToRemotePeer(message);
+            };
 
-                btnChat.Click += async (sender, args) =>
-                {
-                    if (peersListView.SelectedIndex == -1)
-                    {
-                        await new MessageDialog("Please select a peer.").ShowAsync();
-                        return;
-                    }
-                    
-                    Peer remotePeer = peersListView.SelectedItem as Peer;
-                    if (remotePeer == null) return;
+        }
 
-                    _httpSignaler.SendToPeer(remotePeer.Id, "OpenDataChannel");
-                    await SetupPeer(remotePeer, true);
-                };
-            });
+        private void OnSendMessageToRemotePeer(Message message)
+        {
+            SendMessageToRemotePeer?.Invoke(this, message);
         }
 
         private async Task SetupPeer(Peer remotePeer, bool isInitiator)
         {
-            Tuple<OrtcController, ChatPage> tuple;
-            if (_chatSessions.TryGetValue(remotePeer.Id, out tuple))
-            {
-                // Already have a page created
-                tuple.Item2.HandleRemotePeerDisconnected();
-                tuple.Item1.Dispose();
-                _chatSessions.Remove(remotePeer.Id);
-            }
-            else
-            {
-                // No chat page created, create a new one
-                tuple = new Tuple<OrtcController, ChatPage>(null, new ChatPage(OrtcController.LocalPeer, remotePeer));
+            SendMessageToRemotePeer += PeersListPage_SendMessageToRemotePeer;
 
-                tuple.Item2.SendMessageToRemotePeer += ChatPage_SendMessageToRemotePeer;
-            }
+            _ortcController = new OrtcController(remotePeer, isInitiator);
 
-            ChatPageParams parameters = new ChatPageParams();
-            parameters.LocalPeer = OrtcController.LocalPeer;
-            parameters.RemotePeer = remotePeer;
+            _ortcController.DataChannelConnected += OrtcController_OnDataChannelConnected;
+            _ortcController.DataChannelDisconnected += OrtcController_OnDataChannelDisconnected;
+            _ortcController.SignalMessageToPeer += OrtcController_OnSignalMessageToPeer;
+            _ortcController.DataChannelMessage += OrtcController_OnDataChannelMessage;
 
-
-
-            //Frame.Navigate(typeof(ChatPage), parameters);
-            //var viewId = 0;
-            await tuple.Item2.Dispatcher.RunAsync(
-                CoreDispatcherPriority.Normal,
-                () =>
-                {
-                    var frame = new Frame();
-                    frame.Navigate(typeof(ChatPage), parameters);
-                    Window.Current.Content = frame;
-
-                    //viewId = ApplicationView.GetForCurrentView().Id;
-
-                    Window.Current.Activate();
-                });
-
-            //await ApplicationViewSwitcher.TryShowAsStandaloneAsync(viewId);
-
-            // Create a new tuple and carry forward the chat page from the previous tuple
-            tuple = new Tuple<OrtcController, ChatPage>(new OrtcController(remotePeer, isInitiator), tuple.Item2);
-            _chatSessions.Add(remotePeer.Id, tuple);
-
-            tuple.Item1.DataChannelConnected += OrtcSignaler_OnDataChannelConnected;
-            tuple.Item1.DataChannelDisconnected += OrtcSignaler_OnDataChannelDisconnected;
-            tuple.Item1.SignalMessageToPeer += OrtcSignaler_OnSignalMessageToPeer;
-            tuple.Item1.DataChannelMessage += OrtcSignaler_OnDataChannelMessage;
-
-            await tuple.Item1.SetupAsync();
+            await _ortcController.SetupAsync();
         }
 
-        private async void OrtcSignaler_OnDataChannelMessage(object sender, string message)
+        private void PeersListPage_SendMessageToRemotePeer(object sender, Message message)
         {
-            OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Message from remote peer {signaler.RemotePeer.Id}: {message}");
+            Debug.WriteLine($"Send message to remote peer : {message.MessageText}");
 
-            _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
-
-            Tuple<OrtcController, ChatPage> tuple;
-            if (_chatSessions.TryGetValue(signaler.RemotePeer.Id, out tuple))
-            {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => tuple.Item2.HandleMessageFromPeer(signaler.RemotePeer, message));
-            }
+            _ortcController.HandleSendMessageViaDataChannel(message.MessageText);
         }
 
-        private void OrtcSignaler_OnSignalMessageToPeer(object sender, string message)
+        private async void OrtcController_OnDataChannelMessage(object sender, string message)
         {
-            OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Send message to remote peer {signaler.RemotePeer.Id}: {message}");
+            OrtcController ortcc = (OrtcController)sender;
+            Debug.WriteLine($"Message from remote peer {ortcc.RemotePeer.Id}: {message}");
 
-            _httpSignaler.SendToPeer(signaler.RemotePeer.Id, message);
+            _httpSignaler.SendToPeer(ortcc.RemotePeer.Id, message);
+
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => HandleMessageFromPeer(ortcc.RemotePeer, message));
         }
 
-        private void OrtcSignaler_OnDataChannelDisconnected(object sender, EventArgs e)
+        private void OrtcController_OnSignalMessageToPeer(object sender, string message)
         {
-            OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Remote peer disconnected: {signaler.RemotePeer.Id}");
+            OrtcController ortcc = (OrtcController)sender;
+            Debug.WriteLine($"Send message to remote peer {ortcc.RemotePeer.Id}: {message}");
 
-            Tuple<OrtcController, ChatPage> tuple;
-            if (_chatSessions.TryGetValue(signaler.RemotePeer.Id, out tuple))
-            {
-                tuple.Item2.HandleRemotePeerDisconnected();
-            }
+            _httpSignaler.SendToPeer(ortcc.RemotePeer.Id, message);
         }
 
-        private void OrtcSignaler_OnDataChannelConnected(object sender, EventArgs e)
+        private void OrtcController_OnDataChannelDisconnected(object sender, EventArgs e)
         {
-            OrtcController signaler = (OrtcController)sender;
-            Debug.WriteLine($"Remote peer connected: {signaler.RemotePeer.Id}");
+            OrtcController ortcc = (OrtcController)sender;
+            Debug.WriteLine($"Remote peer disconnected: {ortcc.RemotePeer.Id}");
 
-            Tuple<OrtcController, ChatPage> tuple;
-            if (_chatSessions.TryGetValue(signaler.RemotePeer.Id, out tuple))
-            {
-                tuple.Item2.HandleRemotePeerConnected();
-            }
+            HandleRemotePeerDisconnected();
         }
 
-        private void ChatPage_SendMessageToRemotePeer(object sender, Message message)
+        private void OrtcController_OnDataChannelConnected(object sender, EventArgs e)
         {
-            Debug.WriteLine($"Send message to remote peer {message.Recipient.Id}: {message.MessageText}");
+            OrtcController ortcc = (OrtcController)sender;
+            Debug.WriteLine($"Remote peer connected: {ortcc.RemotePeer.Id}");
 
-            Tuple<OrtcController, ChatPage> tuple;
-            if (_chatSessions.TryGetValue(message.Recipient.Id, out tuple))
-            {
-                tuple.Item1.HandleSendMessageViaDataChannel(message.MessageText);
-            }
+            HandleRemotePeerConnected();
         }
-    }
-
-    public class ChatPageParams
-    {
-        public Peer LocalPeer { get; set; }
-        public Peer RemotePeer { get; set; }
     }
 }
